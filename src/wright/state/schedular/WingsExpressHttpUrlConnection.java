@@ -19,27 +19,40 @@ public class WingsExpressHttpUrlConnection {
     private List<String> cookies;
     private HttpsURLConnection connection;
     private final String USER_AGENT = "Mozilla/5.0";
+//    private static String responseUrl;
     
     public static void main(String[] args) throws Exception{
-        String url = "https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_WWWLogin";
-        String wingsExpress = "https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_MainMnu&msg=WELCOME+Welcome,+Cameron+A.+Roudebush,+to+WINGS+Express!Apr+05,+201702%3A07+pm";
+        String loginUrl = "https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_ValLogin";
+        String wings = "https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_StuMainMnu";
+        String scheduleUrl = "https://wingsexpress.wright.edu/pls/PROD/WsuStuRegistration.P_adddropbackout";
         WingsExpressHttpUrlConnection http = new WingsExpressHttpUrlConnection();
         //enable cookies
         CookieHandler.setDefault(new CookieManager());
         
         //Send GET request for forms data
-        String page = http.getPageContent(url);
-        String postParams = http.getFormParams(page, "blah", "blah");
+        String loginPage = http.getPageContent(loginUrl);
+        String postParams = http.getFormParams(loginPage, "", "");
         
         //2 Construct above content and send post rquest
         //authentication
-        http.sendPost(url, postParams);
+        String responseUrl = http.sendPost(loginUrl, postParams, "https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_WWWLogin", "9", "en-US,en;q=0.8");
+        if (responseUrl.contains("content")){
+            System.out.println("Login information incorrect. Exiting...");
+            System.exit(0);
+        }
+        System.out.println("Redirect URL: " + responseUrl);
         
-        //sucess
-        System.out.println(http.getPageContent(url));
+        String schedulePage = http.getPageContent(scheduleUrl);
+        String termParams = http.getFormParams(schedulePage, "201780", "");
+        
+        responseUrl = http.sendPost(scheduleUrl, termParams, "https://wingsexpress.wright.edu/pls/PROD/WsuStuRegistration.P_adddropbackout", "14", "en-US,en;q=0.5");
+        
+        
+        schedulePage = http.getPageContent(scheduleUrl);
+        System.out.println(schedulePage);
     }
     
-    private void sendPost(String url, String postParams) throws Exception {
+    private String sendPost(String url, String postParams, String referer, String contentLength, String language) throws Exception {
         URL obj = new URL(url);
         connection = (HttpsURLConnection) obj.openConnection();
         
@@ -47,16 +60,19 @@ public class WingsExpressHttpUrlConnection {
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Host", "wingsexpress.wright.edu");
         connection.setRequestProperty("User-Agent", USER_AGENT);
-        connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-        connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
+        connection.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
         connection.setRequestProperty("Connection", "keep-alive");
-        connection.setRequestProperty("Referer", "https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_ValLogin");
-        for (String cookie : this.cookies){
+        connection.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
+        
+        connection.setRequestProperty("Accept-Language", language);
+        connection.setRequestProperty("Referer", referer);
+        
+        
+        this.cookies.forEach((cookie) -> {
             connection.addRequestProperty("Cookie", cookie.split(";", 1)[0]);
-        }
+        });
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        connection.setRequestProperty("Content-Length", "31");
+        connection.setRequestProperty("Content-Length", contentLength);
         
         connection.setDoOutput(true);
         connection.setDoInput(true);
@@ -73,12 +89,15 @@ public class WingsExpressHttpUrlConnection {
         System.out.println("Response Code: " + responseCode);
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
-        StringBuffer response = new StringBuffer();;
+        StringBuilder response = new StringBuilder();
         while ((inputLine = in.readLine()) != null){
             response.append(inputLine);
         }
         in.close();
-        System.out.println("Response: " + response.toString());
+        if (url.equals("https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_ValLogin")){
+        return "https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_MainMnu&" + response.substring(108,response.length()-16);
+        }
+        else return "";
     }
     
     
@@ -102,7 +121,7 @@ public class WingsExpressHttpUrlConnection {
         System.out.println("Response Code: " + responseCode);
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
         
         while((inputLine = in.readLine()) != null){
             response.append(inputLine);
@@ -120,22 +139,25 @@ public class WingsExpressHttpUrlConnection {
         return cookies;
     }
     
-    public String getFormParams(String html, String username, String password) throws Exception{
+    public String getFormParams(String html, String valueOne, String valueTwo) throws Exception{
         System.out.println("Extracting form's data...");
-        Document doc =  Jsoup.parse(html);
+        Document doc = Jsoup.parse(html);
                 
         //Wright State Form ID
-        Elements inputElements = doc.getElementsByTag("input");
+        Elements inputElements = doc.getAllElements();
         List<String> paramList = new ArrayList<>();
         for (Element inputElement : inputElements) {
             String key = inputElement.attr("name");
-            String value = inputElement.attr("value");
+            String value;
             
             if (key.equals("sid")){
-                value = username;
+                value = valueOne;
                 paramList.add(key + "=" + URLEncoder.encode(value, "UTF-8"));
-            }else if (key.equals("PIN")){
-                value = password;
+            }if (key.equals("PIN")){
+                value = valueTwo;
+                paramList.add(key + "=" + URLEncoder.encode(value, "UTF-8"));
+            }if (key.equals("term_in")){
+                value = valueOne;
                 paramList.add(key + "=" + URLEncoder.encode(value, "UTF-8"));
             }
         }
@@ -148,6 +170,7 @@ public class WingsExpressHttpUrlConnection {
                 result.append("&").append(param);
             }
         });
+        System.out.println(paramList.toString());
         return result.toString();
     }
 }
