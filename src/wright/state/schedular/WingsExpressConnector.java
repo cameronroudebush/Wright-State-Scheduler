@@ -3,7 +3,9 @@ package wright.state.schedular;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
+import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +24,9 @@ public class WingsExpressConnector {
         this.crns = crns;
     }
     
-    private void pluginCrns () throws IOException{
+    public void pluginCrns (){
+            System.out.println(pin + uid + semester + crns);
+            try{
             //Generate the web client
             WebClient crnPage = new WebClient();
             //Load the login page
@@ -41,10 +45,6 @@ public class WingsExpressConnector {
             submitButton.click();
             //change page to add or drop classes page
             page = crnPage.getPage("https://wingsexpress.wright.edu/pls/PROD/WsuStuRegistration.P_adddropbackout");
-            //Locate semester select dropdown
-            HtmlInput selectSemester = page.getFirstByXPath("//*[@id=\"term_id\"]/option");
-            //Plugin semester
-            selectSemester.setValueAttribute(semester);
             //Locate submit semester button
             HtmlSubmitInput submitSemester = page.getFirstByXPath("/html/body/div[4]/form/input");
             //Click the submit semester button
@@ -69,5 +69,9 @@ public class WingsExpressConnector {
             //The following two lines are used to print out the html to the console for testing
             WebResponse response = page.getWebResponse();
             String content = response.getContentAsString();
+            System.out.println(content);
+            }catch (IOException e){
+                System.out.println("Error: Unable to load wingsexpress webpages.");
+            }
     }
 }
