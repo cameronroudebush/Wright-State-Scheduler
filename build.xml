@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="Wright_State_Schedular" default="default" basedir=".">
-    <description>Builds, tests, and runs the project Wright State Schedular.</description>
+<project name="Wright_State_Scheduler" default="default" basedir=".">
+    <description>Builds, tests, and runs the project Wright State Scheduler.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 
@@ -58,7 +58,7 @@
 
     An example of overriding the target for project execution could look like this:
 
-        <target name="run" depends="Wright_State_Schedular-impl.jar">
+        <target name="run" depends="Wright_State_Scheduler-impl.jar">
             <exec dir="bin" executable="launcher.exe">
                 <arg file="${dist.jar}"/>
             </exec>
