@@ -25,7 +25,6 @@ public class WingsExpressConnector {
     }
     
     public void pluginCrns (){
-            System.out.println(pin + uid + semester + crns);
             try{
             //Generate the web client
             WebClient webClient = new WebClient();

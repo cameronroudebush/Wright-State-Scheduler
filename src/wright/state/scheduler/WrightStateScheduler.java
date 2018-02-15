@@ -79,23 +79,23 @@ public class WrightStateScheduler extends Application {
                 semester = 40;
             }
             String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
-            while (!dateTime.substring(0,10).equals(scheduleDate.getText())){
-                try {
-                    System.out.println("Hit wait command on date.");
-                    Thread.sleep(60000);
-                } catch (InterruptedException ex) {
-                    System.out.println("Error in waiting");
-                }
-            }
-            while (!dateTime.substring(12,dateTime.length()).equals("07:00:00")){
-                try {
-                    System.out.println(dateTime.substring(12,dateTime.length()));
-                    System.out.println("Hit wait command on time.");
-                    Thread.sleep(60000);
-                } catch (InterruptedException ex) {
-                    System.out.println("Error in waiting");
-                }
-            }
+//            while (!dateTime.substring(0,10).equals(scheduleDate.getText())){
+//                try {
+//                    System.out.println("Hit wait command on date.");
+//                    Thread.sleep(60000);
+//                } catch (InterruptedException ex) {
+//                    System.out.println("Error in waiting");
+//                }
+//            }
+//            while (!dateTime.substring(12,dateTime.length()).equals("07:00:00")){
+//                try {
+//                    System.out.println(dateTime.substring(12,dateTime.length()));
+//                    System.out.println("Hit wait command on time.");
+//                    Thread.sleep(60000);
+//                } catch (InterruptedException ex) {
+//                    System.out.println("Error in waiting");
+//                }
+//            }
             WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), semesterDate.getText()+semester ,crns);
             connector.pluginCrns();
         });
