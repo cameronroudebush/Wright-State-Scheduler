@@ -49,9 +49,12 @@ public class WrightStateScheduler extends Application {
         semesterDate.setPromptText("2018");
         RadioButton spring = new RadioButton("Spring");
         RadioButton fall = new RadioButton("Fall");
-        main.add(fall, 8, 4);
-        main.add(spring, 9, 4);
+        RadioButton summer = new RadioButton("Summer");
+        main.add(fall, 9, 4);
+        main.add(summer, 8, 4);
+        main.add(spring, 10, 4);
         ToggleGroup semesterButtons = new ToggleGroup();
+        summer.setToggleGroup(semesterButtons);
         spring.setToggleGroup(semesterButtons);
         fall.setToggleGroup(semesterButtons);
         fall.setSelected(true);
@@ -72,11 +75,14 @@ public class WrightStateScheduler extends Application {
                     crns.push(textFields.get(i).getText());
                 }
             }
+            //added summer semester ability
             int semester;
             if (semesterButtons.getSelectedToggle() == fall){
                 semester = 80;
-            }else {
+            }else if (semesterButtons.getSelectedToggle() == summer) {
                 semester = 40;
+            } else {
+                semester = 30;
             }
             String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
 //            while (!dateTime.substring(0,10).equals(scheduleDate.getText())){
@@ -96,11 +102,13 @@ public class WrightStateScheduler extends Application {
 //                    System.out.println("Error in waiting");
 //                }
 //            }
-            WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), semesterDate.getText()+semester ,crns);
-            connector.pluginCrns();
+            //runs the connector in a new thread
+            Thread t = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), semesterDate.getText()+semester ,crns));
+            //made the connector a thread
+            t.run();
         });
         
-        Scene scene = new Scene(main, 800,175);
+        Scene scene = new Scene(main, 900,190);
         stage.setScene(scene);
         stage.setResizable(false);
         stage.setTitle("Wright State Schedular");

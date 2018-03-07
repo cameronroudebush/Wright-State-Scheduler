@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class WingsExpressConnector {
+public class WingsExpressConnector implements Runnable {
     private final String pin;
     private final String uid;
     private final String semester;
@@ -23,6 +23,7 @@ public class WingsExpressConnector {
         this.semester = semester;
         this.crns = crns;
     }
+    
     
     public void pluginCrns (){
             try{
@@ -62,7 +63,7 @@ public class WingsExpressConnector {
             }
             //Add any CRNs we have into the given boxes
             while (!crns.isEmpty()){
-                int i = 1;
+                int i = 0;
                 crnBoxes.get(i).setValueAttribute(crns.pop());
                 i++;
             }
@@ -77,5 +78,10 @@ public class WingsExpressConnector {
             }catch (IOException e){
                 System.out.println("Error: Unable to load wingsexpress webpages.");
             }
+    }
+
+    @Override
+    public void run() {
+        pluginCrns();
     }
 }
