@@ -31,6 +31,7 @@ public class WrightStateScheduler extends Application {
         ArrayList<TextField> textFields = new ArrayList();
         for (int i = 0; i < 10; i++){
             textFields.add(new TextField());
+            textFields.get(i).setPromptText("12345");
             main.add(textFields.get(i), i, 1);
         }
         main.add(new Label("Enter your UID:"), 0, 3,2,1);
@@ -42,11 +43,11 @@ public class WrightStateScheduler extends Application {
         main.add(password, 1, 4,2,1);
         main.add(new Label("Enter your schedule date:"), 4, 3,3,1);
         TextField scheduleDate = new TextField();
-        scheduleDate.setPromptText("MM/DD/YYYY");
-        main.add(scheduleDate, 6, 3,2,1);
+        scheduleDate.setPromptText("MM/DD");
+        main.add(scheduleDate,7,3,1,1);
         main.add(new Label("Enter your desired year and select semester:"), 4, 4,4,1);
-        TextField semesterDate = new TextField();
-        semesterDate.setPromptText("2018");
+        TextField semesterYear = new TextField();
+        semesterYear.setPromptText("2018");
         RadioButton spring = new RadioButton("Spring");
         RadioButton fall = new RadioButton("Fall");
         RadioButton summer = new RadioButton("Summer");
@@ -58,7 +59,7 @@ public class WrightStateScheduler extends Application {
         spring.setToggleGroup(semesterButtons);
         fall.setToggleGroup(semesterButtons);
         fall.setSelected(true);
-        main.add(semesterDate, 7, 4,1,1);
+        main.add(semesterYear, 7, 4,1,1);
         TextField time = new TextField();
         time.setEditable(false);
         main.add(time, 7, 0,3,1);
@@ -103,7 +104,7 @@ public class WrightStateScheduler extends Application {
 //                }
 //            }
             //runs the connector in a new thread
-            Thread t = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), semesterDate.getText()+semester ,crns));
+            Thread t = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), semesterYear.getText()+semester ,crns));
             //made the connector a thread
             t.start();
         });
