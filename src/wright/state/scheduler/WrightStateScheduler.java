@@ -105,7 +105,7 @@ public class WrightStateScheduler extends Application {
             //runs the connector in a new thread
             Thread t = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), semesterDate.getText()+semester ,crns));
             //made the connector a thread
-            t.run();
+            t.start();
         });
         
         Scene scene = new Scene(main, 1000,200);
