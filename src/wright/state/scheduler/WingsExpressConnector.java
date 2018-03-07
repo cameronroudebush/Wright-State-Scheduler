@@ -62,8 +62,8 @@ public class WingsExpressConnector implements Runnable {
                 crnBoxes.add((HtmlInput) page.getFirstByXPath("//*[@id=\"crn_id"+i+"\"]"));
             }
             //Add any CRNs we have into the given boxes
+            int i = 0;
             while (!crns.isEmpty()){
-                int i = 0;
                 crnBoxes.get(i).setValueAttribute(crns.pop());
                 i++;
             }
