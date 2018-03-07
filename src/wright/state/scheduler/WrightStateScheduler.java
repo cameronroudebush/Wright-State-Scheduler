@@ -52,7 +52,7 @@ public class WrightStateScheduler extends Application {
         RadioButton summer = new RadioButton("Summer");
         main.add(fall, 9, 4);
         main.add(summer, 8, 4);
-        main.add(spring, 10, 4);
+        main.add(spring, 9, 3);
         ToggleGroup semesterButtons = new ToggleGroup();
         summer.setToggleGroup(semesterButtons);
         spring.setToggleGroup(semesterButtons);
@@ -108,7 +108,7 @@ public class WrightStateScheduler extends Application {
             t.run();
         });
         
-        Scene scene = new Scene(main, 900,190);
+        Scene scene = new Scene(main, 1000,200);
         stage.setScene(scene);
         stage.setResizable(false);
         stage.setTitle("Wright State Schedular");
