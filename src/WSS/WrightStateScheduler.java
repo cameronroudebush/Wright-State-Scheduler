@@ -1,4 +1,4 @@
-package wright.state.scheduler;
+package WSS;
 
 import java.util.ArrayList;
 import java.util.Stack;
