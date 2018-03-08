@@ -41,24 +41,26 @@ public class WrightStateScheduler extends Application {
         main.add(new Label("Enter your PIN:"), 0, 4,2,1);
         PasswordField password = new PasswordField();
         main.add(password, 1, 4,2,1);
-        main.add(new Label("Enter your schedule date:"), 4, 3,3,1);
+        main.add(new Label("Enter your schedule date:"), 3, 3,3,1);
         TextField scheduleDate = new TextField();
-        scheduleDate.setPromptText("MM/DD");
-        main.add(scheduleDate,7,3,1,1);
-        main.add(new Label("Enter your desired year and select semester:"), 4, 4,4,1);
-        TextField semesterYear = new TextField();
-        semesterYear.setPromptText("2018");
+        scheduleDate.setPromptText("MM/DD/YYYY");
+        main.add(scheduleDate,5,3,1,1);
+        main.add(new Label("Enter your schedule time:"), 3, 4,4,1);
+        TextField scheduleTime = new TextField();
+        scheduleTime.setPromptText("HH:MM");
+        main.add(scheduleTime, 5, 4,1,1);
         RadioButton spring = new RadioButton("Spring");
         RadioButton fall = new RadioButton("Fall");
         RadioButton summer = new RadioButton("Summer");
-        main.add(fall, 9, 4);
-        main.add(summer, 8, 4);
-        main.add(spring, 9, 3);
+        main.add(new Label("Select Semester:"), 7, 3,3,1);
+        main.add(spring, 6, 4);
+        main.add(summer, 7, 4);
+        main.add(fall, 8, 4);
         ToggleGroup semesterButtons = new ToggleGroup();
         summer.setToggleGroup(semesterButtons);
         spring.setToggleGroup(semesterButtons);
         fall.setToggleGroup(semesterButtons);
-        main.add(semesterYear, 7, 4,1,1);
+       
         TextField time = new TextField();
         time.setEditable(false);
         main.add(time, 7, 0,3,1);
@@ -104,7 +106,7 @@ public class WrightStateScheduler extends Application {
 //                }
 //            }
             //runs the connector in a new thread
-            Thread t = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), semesterYear.getText()+semester ,crns));
+            Thread t = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), scheduleDate.getText().substring(scheduleDate.getText().length()-4,scheduleDate.getText().length())+semester ,crns));
             //made the connector a thread
             t.start();
         });
