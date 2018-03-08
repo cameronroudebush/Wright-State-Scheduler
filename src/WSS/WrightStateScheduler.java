@@ -34,18 +34,18 @@ public class WrightStateScheduler extends Application {
         main.setVgap(10);
         main.setHgap(20);
         main.add(new Label("Enter CRN's Below:"), 0, 0, 5, 1);
-        ArrayList<TextField> textFields = new ArrayList();
+        ArrayList<TextField> crnBoxes = new ArrayList();
         for (int i = 0; i < 10; i++) {
-            textFields.add(new TextField());
-            textFields.get(i).setPromptText("12345");
+            crnBoxes.add(new TextField());
+            crnBoxes.get(i).setPromptText("12345");
             TextFormatter<TextField> tf = new TextFormatter<>(e -> {
                 if (e.getControlNewText().length() > 5) {
                     return null;
                 }
                 return e;
             });
-            textFields.get(i).setTextFormatter(tf);
-            main.add(textFields.get(i), i, 1);
+            crnBoxes.get(i).setTextFormatter(tf);
+            main.add(crnBoxes.get(i), i, 1);
         }
         main.add(new Label("Enter your UID:"), 0, 3, 2, 1);
         TextField userName = new TextField();
@@ -104,34 +104,55 @@ public class WrightStateScheduler extends Application {
         schedule.setMinWidth(305);
         main.add(schedule, 3, 5, 6, 1);
         schedule.setOnAction(e -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Submitting CRNs");
-            alert.setHeaderText(null);
-            ButtonType buttonYes = new ButtonType("Yes");
-            ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
-            alert.getButtonTypes().setAll(buttonYes, buttonNo);
-            alert.setContentText("You are about to register for classes.\n"
-                    + "Please note that this program does not check for invalid CRNs.\n"
-                    + "If you wish to proceed, press yes.");
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == buttonYes) {
-                Stack<String> crns = new Stack();
-                for (int i = 0; i < 10; i++) {
-                    if (!textFields.get(i).getText().isEmpty()) {
-                        crns.push(textFields.get(i).getText());
+            int emptyCrnBoxes = 0;
+            for (int i = 0; i < crnBoxes.size(); i++){
+                    if (crnBoxes.get(i).getText().isEmpty())emptyCrnBoxes++;
+                }
+            if (userName.getText().isEmpty() || password.getText().isEmpty()) {
+                Alert regError = new Alert(AlertType.ERROR, "You seem to have miss typed your login info.");
+                regError.setHeaderText("Incorrect login");
+                regError.showAndWait();
+            } else if (scheduleDate.getText().length() < 4) {
+                Alert badDate = new Alert(AlertType.ERROR, "You must include a date following the MM/DD/YYYY format.");
+                badDate.setHeaderText("Date format error");
+                badDate.showAndWait();
+            } else if (semesterButtons.getSelectedToggle() == null) {
+                Alert noToggle = new Alert(AlertType.ERROR, "You must select a semester.");
+                noToggle.setHeaderText("Semester Selection");
+                noToggle.showAndWait();
+            } else if (emptyCrnBoxes == 10) {
+                Alert noToggle = new Alert(AlertType.ERROR, "You have not inserted any CRN's.");
+                noToggle.setHeaderText("No CRN's");
+                noToggle.showAndWait();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Submitting CRNs");
+                alert.setHeaderText(null);
+                ButtonType buttonYes = new ButtonType("Yes");
+                ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+                alert.getButtonTypes().setAll(buttonYes, buttonNo);
+                alert.setContentText("You are about to register for classes.\n"
+                        + "Please note that this program does not check for invalid CRNs.\n"
+                        + "If you wish to proceed, press yes.");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == buttonYes) {
+                    Stack<String> crns = new Stack();
+                    for (int i = 0; i < 10; i++) {
+                        if (!crnBoxes.get(i).getText().isEmpty()) {
+                            crns.push(crnBoxes.get(i).getText());
+                        }
                     }
-                }
-                int semester;
-                if (semesterButtons.getSelectedToggle() == fall) {
-                    semester = 80;
-                } else if (semesterButtons.getSelectedToggle() == summer) {
-                    semester = 40;
-                } else if (semesterButtons.getSelectedToggle() == spring) {
-                    semester = 30;
-                } else {
-                    semester = 0;
-                }
-                String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
+                    int semester;
+                    if (semesterButtons.getSelectedToggle() == fall) {
+                        semester = 80;
+                    } else if (semesterButtons.getSelectedToggle() == summer) {
+                        semester = 40;
+                    } else if (semesterButtons.getSelectedToggle() == spring) {
+                        semester = 30;
+                    } else {
+                        semester = 0;
+                    }
+                    String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
 //            while (!dateTime.substring(0,10).equals(scheduleDate.getText())){
 //                try {
 //                    System.out.println("Hit wait command on date.");
@@ -150,31 +171,28 @@ public class WrightStateScheduler extends Application {
 //                }
 //            }
 
-                //runs the connector in a new thread
-                try {
-                    String scheduleYear = scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length());
-                    WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns);
-                    Thread t = new Thread(connector);
-                    t.start();
-                    t.join();
-                    String content = connector.getContent();
-                    if (content.contains("Registration Add Errors")) {
-                        Alert regError = new Alert(AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
-                        regError.setHeaderText("Registration Add Error");
-                        regError.showAndWait();
+                    //runs the connector in a new thread
+                    try {
+                        String scheduleYear = scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length());
+                        WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns);
+                        Thread t = new Thread(connector);
+                        t.start();
+                        t.join();
+                        String content = connector.getContent();
+                        if (content.contains("Registration Add Errors")) {
+                            Alert regError = new Alert(AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
+                            regError.setHeaderText("Registration Add Error");
+                            regError.showAndWait();
+                        }
+                        if (content.contains("Corequisite")) {
+                            Alert coReqError = new Alert(AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
+                            coReqError.setHeaderText("Corequisite Error");
+                            coReqError.showAndWait();;
+                        }
+                    } catch (InterruptedException ex) {
                     }
-                    if (content.contains("Corequisite")) {
-                        Alert coReqError = new Alert(AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
-                        coReqError.setHeaderText("Corequisite Error");
-                        coReqError.showAndWait();;
-                    }
-                } catch (StringIndexOutOfBoundsException z) {
-                    Alert badDate = new Alert(AlertType.ERROR, "You must include a date following the MM/DD/YYYY format.");
-                    badDate.setHeaderText("Date format error");
-                    badDate.showAndWait();
-                } catch (InterruptedException ex) {}
+                }
             }
-
         });
 
         Scene scene = new Scene(main, 1000, 200);
