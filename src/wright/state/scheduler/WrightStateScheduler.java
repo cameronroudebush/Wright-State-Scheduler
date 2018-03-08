@@ -58,7 +58,6 @@ public class WrightStateScheduler extends Application {
         summer.setToggleGroup(semesterButtons);
         spring.setToggleGroup(semesterButtons);
         fall.setToggleGroup(semesterButtons);
-        fall.setSelected(true);
         main.add(semesterYear, 7, 4,1,1);
         TextField time = new TextField();
         time.setEditable(false);
@@ -76,14 +75,15 @@ public class WrightStateScheduler extends Application {
                     crns.push(textFields.get(i).getText());
                 }
             }
-            //added summer semester ability
             int semester;
             if (semesterButtons.getSelectedToggle() == fall){
                 semester = 80;
             }else if (semesterButtons.getSelectedToggle() == summer) {
                 semester = 40;
-            } else {
+            } else if (semesterButtons.getSelectedToggle() == spring) {
                 semester = 30;
+            }else {
+                semester = 0;
             }
             String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
 //            while (!dateTime.substring(0,10).equals(scheduleDate.getText())){
