@@ -123,6 +123,9 @@ public class WingsExpressConnector implements Runnable {
             if (content.contains("Registration Add Errors")){
                 log.println("There was some sort of error adding the crn's. Please check with WingsExpress and find what failed.");
             }
+            if (content.contains("Corequisite")){
+                log.println("There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
+            }
             log.close();
         } catch (Exception e) {}
     }
