@@ -20,6 +20,7 @@ public class WingsExpressConnector implements Runnable {
     private final String uid;
     private final String semester;
     private final Stack<String> crns;
+    private String content;
     
 
     public WingsExpressConnector(String pin, String uid, String semester, Stack<String> crns) {
@@ -27,6 +28,9 @@ public class WingsExpressConnector implements Runnable {
         this.uid = uid;
         this.semester = semester;
         this.crns = crns;
+    }
+    public String getContent (){
+        return content;
     }
 
     public void pluginCrns() {
@@ -119,12 +123,12 @@ public class WingsExpressConnector implements Runnable {
             page = submitCrns.click();
             log.println("Clicking submit Crn's button.");
             WebResponse response = page.getWebResponse();
-            String content = response.getContentAsString();
+            content = response.getContentAsString();
             if (content.contains("Registration Add Errors")){
-                log.println("There was some sort of error adding the crn's. Please check with WingsExpress and find what failed.");
+                log.println("CRN registration add failure");
             }
             if (content.contains("Corequisite")){
-                log.println("There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
+                log.println("Corequisite error");
             }
             log.close();
         } catch (Exception e) {}

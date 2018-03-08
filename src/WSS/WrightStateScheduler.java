@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -150,9 +151,28 @@ public class WrightStateScheduler extends Application {
 //            }
 
                 //runs the connector in a new thread
-                Thread t = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length()) + semester, crns));
-                //made the connector a thread
-                t.start();
+                try {
+                    String scheduleYear = scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length());
+                    WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns);
+                    Thread t = new Thread(connector);
+                    t.start();
+                    t.join();
+                    String content = connector.getContent();
+                    if (content.contains("Registration Add Errors")) {
+                        Alert regError = new Alert(AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
+                        regError.setHeaderText("Registration Add Error");
+                        regError.showAndWait();
+                    }
+                    if (content.contains("Corequisite")) {
+                        Alert coReqError = new Alert(AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
+                        coReqError.setHeaderText("Corequisite Error");
+                        coReqError.showAndWait();;
+                    }
+                } catch (StringIndexOutOfBoundsException z) {
+                    Alert badDate = new Alert(AlertType.ERROR, "You must include a date following the MM/DD/YYYY format.");
+                    badDate.setHeaderText("Date format error");
+                    badDate.showAndWait();
+                } catch (InterruptedException ex) {}
             }
 
         });
