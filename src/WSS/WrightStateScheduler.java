@@ -1,12 +1,16 @@
 package WSS;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.Timer;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
@@ -99,23 +103,34 @@ public class WrightStateScheduler extends Application {
         schedule.setMinWidth(305);
         main.add(schedule, 3, 5, 6, 1);
         schedule.setOnAction(e -> {
-            Stack<String> crns = new Stack();
-            for (int i = 0; i < 10; i++) {
-                if (!textFields.get(i).getText().isEmpty()) {
-                    crns.push(textFields.get(i).getText());
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Submitting CRNs");
+            alert.setHeaderText(null);
+            ButtonType buttonYes = new ButtonType("Yes");
+            ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(buttonYes, buttonNo);
+            alert.setContentText("You are about to register for classes.\n"
+                    + "Please note that this program does not check for invalid CRNs.\n"
+                    + "If you wish to proceed, press yes.");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == buttonYes) {
+                Stack<String> crns = new Stack();
+                for (int i = 0; i < 10; i++) {
+                    if (!textFields.get(i).getText().isEmpty()) {
+                        crns.push(textFields.get(i).getText());
+                    }
                 }
-            }
-            int semester;
-            if (semesterButtons.getSelectedToggle() == fall) {
-                semester = 80;
-            } else if (semesterButtons.getSelectedToggle() == summer) {
-                semester = 40;
-            } else if (semesterButtons.getSelectedToggle() == spring) {
-                semester = 30;
-            } else {
-                semester = 0;
-            }
-            String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
+                int semester;
+                if (semesterButtons.getSelectedToggle() == fall) {
+                    semester = 80;
+                } else if (semesterButtons.getSelectedToggle() == summer) {
+                    semester = 40;
+                } else if (semesterButtons.getSelectedToggle() == spring) {
+                    semester = 30;
+                } else {
+                    semester = 0;
+                }
+                String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
 //            while (!dateTime.substring(0,10).equals(scheduleDate.getText())){
 //                try {
 //                    System.out.println("Hit wait command on date.");
@@ -133,10 +148,13 @@ public class WrightStateScheduler extends Application {
 //                    System.out.println("Error in waiting");
 //                }
 //            }
-            //runs the connector in a new thread
-            Thread t = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length()) + semester, crns));
-            //made the connector a thread
-            t.start();
+
+                //runs the connector in a new thread
+                Thread t = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length()) + semester, crns));
+                //made the connector a thread
+                t.start();
+            }
+
         });
 
         Scene scene = new Scene(main, 1000, 200);
