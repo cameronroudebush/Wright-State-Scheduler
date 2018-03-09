@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.Timer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -61,7 +63,7 @@ public class WrightStateScheduler extends Application {
         scheduleLaterTooltip.setText("This will schedule your classes at a specified time.");
         schedule.setMinWidth(305);
         schedule.setTooltip(scheduleLaterTooltip);
-        
+
         Button scheduleNow = new Button("Schedule! (Now)");
         Tooltip scheduleNowTooltip = new Tooltip();
         scheduleNowTooltip.setText("This will schedule your classes immediately.");
@@ -104,7 +106,7 @@ public class WrightStateScheduler extends Application {
         main.add(summer, 7, 4);
         main.add(fall, 8, 4);
         main.add(scheduleNow, 1, 5, 6, 1);
-        main.add(schedule, 4, 5, 6, 1);
+        main.add(schedule, 5, 5, 6, 1);
         main.add(time, 7, 0, 3, 1);
 
         //verifies user input is 9 digits long
@@ -198,7 +200,7 @@ public class WrightStateScheduler extends Application {
                 }
             }
         });
-        
+
         scheduleNow.setOnAction(e -> {
             int emptyCrnBoxes = 0;
             for (int i = 0; i < crnBoxes.size(); i++) {
@@ -257,8 +259,25 @@ public class WrightStateScheduler extends Application {
                         regError.setHeaderText("Incorrect login");
                         regError.showAndWait();
                     } else {
-                        Thread runner = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns));
+                        WingsExpressConnector connectorReal = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns);
+                        Thread runner = new Thread(connectorReal);
                         runner.start();
+                        try {
+                            runner.join();
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(WrightStateScheduler.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        String content = connectorReal.getContent();
+                        if (content.contains("Registration Add Errors")) {
+                            Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
+                            regError.setHeaderText("Registration Add Error");
+                            regError.showAndWait();
+                        }
+                        if (content.contains("Corequisite")) {
+                            Alert coReqError = new Alert(Alert.AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
+                            coReqError.setHeaderText("Corequisite Error");
+                            coReqError.showAndWait();;
+                        }
                     }
                 }
             }
