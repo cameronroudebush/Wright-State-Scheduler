@@ -35,14 +35,14 @@ public class ScheduleWaiter implements Runnable {
     private void comparisonWaiter() {
         while (!currentTime.getCurrentDateAndTime().substring(14, 24).equals(scheduleDate)) {
             try {
-                System.out.println("Hit wait command on date.");
+                log.println("Hit wait command on date.");
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
             }
         }
         while (!currentTime.getCurrentDateAndTime().substring(25, currentTime.getCurrentDateAndTime().length()).equals(scheduleTime)) {
             try {
-                System.out.println("Hit wait command on time.");
+                log.println("Hit wait command on time.");
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
             }
