@@ -34,6 +34,7 @@ public class WingsExpressConnector implements Runnable {
 
     public void pluginCrns() {
         try {
+            log.println("Running CRN plugin.");
             //Generate the web client
             WebClient webClient = new WebClient();
             //Load the login page
@@ -72,9 +73,6 @@ public class WingsExpressConnector implements Runnable {
             }
             //Select proper semester
             log.println("Inserting semester option.");
-            if (semester.length() <= 2 | semester.equals("0")) {
-                log.println("Empty semester inserted.");
-            }
             log.println(semester);
             HtmlOption semesterOption = semesterDropDown.getOptionByValue(semester);
             semesterOption.setSelected(true);
@@ -164,7 +162,7 @@ public class WingsExpressConnector implements Runnable {
             return true;
         }
     }
-
+    
     @Override
     public void run() {
         pluginCrns();
