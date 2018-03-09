@@ -1,5 +1,8 @@
 package WSS;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Stack;
@@ -105,12 +108,14 @@ public class WrightStateScheduler extends Application {
         main.add(schedule, 3, 5, 6, 1);
         schedule.setOnAction(e -> {
             int emptyCrnBoxes = 0;
-            for (int i = 0; i < crnBoxes.size(); i++){
-                    if (crnBoxes.get(i).getText().isEmpty())emptyCrnBoxes++;
+            for (int i = 0; i < crnBoxes.size(); i++) {
+                if (crnBoxes.get(i).getText().isEmpty()) {
+                    emptyCrnBoxes++;
                 }
+            }
             if (userName.getText().isEmpty() || password.getText().isEmpty()) {
-                Alert regError = new Alert(AlertType.ERROR, "You seem to have miss typed your login info.");
-                regError.setHeaderText("Incorrect login");
+                Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
+                regError.setHeaderText("Empty login");
                 regError.showAndWait();
             } else if (scheduleDate.getText().length() < 4) {
                 Alert badDate = new Alert(AlertType.ERROR, "You must include a date following the MM/DD/YYYY format.");
@@ -170,27 +175,33 @@ public class WrightStateScheduler extends Application {
 //                    System.out.println("Error in waiting");
 //                }
 //            }
-
-                    //runs the connector in a new thread
                     try {
+                        PrintStream log = new PrintStream(new File("log.txt"));
                         String scheduleYear = scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length());
-                        WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns);
-                        Thread t = new Thread(connector);
-                        t.start();
-                        t.join();
-                        String content = connector.getContent();
-                        if (content.contains("Registration Add Errors")) {
-                            Alert regError = new Alert(AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
-                            regError.setHeaderText("Registration Add Error");
+                        WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
+                        if (connector.loginTest()) {
+                            Alert regError = new Alert(AlertType.ERROR, "You seem to have miss typed your login info.");
+                            regError.setHeaderText("Incorrect login");
                             regError.showAndWait();
+                        } else {
+                            Thread t = new Thread(connector);
+                            t.start();
+                            t.join();
+                            String content = connector.getContent();
+                            if (content.contains("Registration Add Errors")) {
+                                Alert regError = new Alert(AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
+                                regError.setHeaderText("Registration Add Error");
+                                regError.showAndWait();
+                            }
+                            if (content.contains("Corequisite")) {
+                                Alert coReqError = new Alert(AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
+                                coReqError.setHeaderText("Corequisite Error");
+                                coReqError.showAndWait();;
+                            }
                         }
-                        if (content.contains("Corequisite")) {
-                            Alert coReqError = new Alert(AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
-                            coReqError.setHeaderText("Corequisite Error");
-                            coReqError.showAndWait();;
-                        }
-                    } catch (InterruptedException ex) {
+                    } catch (InterruptedException | FileNotFoundException ex) {
                     }
+
                 }
             }
         });

@@ -1,7 +1,5 @@
 package WSS;
 
-
-
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
@@ -9,7 +7,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
-import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -21,21 +18,22 @@ public class WingsExpressConnector implements Runnable {
     private final String semester;
     private final Stack<String> crns;
     private String content;
-    
+    private PrintStream log;
 
-    public WingsExpressConnector(String pin, String uid, String semester, Stack<String> crns) {
+    public WingsExpressConnector(String pin, String uid, String semester, Stack<String> crns, PrintStream log) {
         this.pin = pin;
         this.uid = uid;
         this.semester = semester;
         this.crns = crns;
+        this.log = log;
     }
-    public String getContent (){
+    
+    public String getContent() {
         return content;
     }
 
     public void pluginCrns() {
         try {
-            PrintStream log = new PrintStream(new File("log.txt"));
             //Generate the web client
             WebClient webClient = new WebClient();
             //Load the login page
@@ -48,9 +46,6 @@ public class WingsExpressConnector implements Runnable {
             //Plugin UID
             userBox.setValueAttribute(uid);
             log.println("UID inserted.");
-            if (uid.length() == 0){
-                log.println("Empty UID inserted.");
-            }
             //Locate the Pin box from xml
             log.println("PIN box located.");
             HtmlInput pinBox = (HtmlInput) page.getFirstByXPath("//*[@id=\"PIN\"]/input");
@@ -58,9 +53,6 @@ public class WingsExpressConnector implements Runnable {
             //Plugin Pin
             pinBox.setValueAttribute(pin);
             log.println("PIN inserted.");
-            if (pin.length() == 0){
-                log.println("Empty PIN inserted.");
-            }
             //Locate submit login button from xml
             log.println("Located login button.");
             HtmlSubmitInput submitButton = page.getFirstByXPath("/html/body/div[4]/form/p/input[1]");
@@ -75,12 +67,12 @@ public class WingsExpressConnector implements Runnable {
             log.println("Located semester drop down box.");
             HtmlSelect semesterDropDown = page.getFirstByXPath("//*[@id=\"term_id\"]");
             log.println(semesterDropDown);
-            if (semesterDropDown == null){
+            if (semesterDropDown == null) {
                 log.println("Either the drop down box doesn't exist or the login info provided is incorrect.");
             }
             //Select proper semester
             log.println("Inserting semester option.");
-            if (semester.length() <= 2 | semester.equals("0")){
+            if (semester.length() <= 2 | semester.equals("0")) {
                 log.println("Empty semester inserted.");
             }
             log.println(semester);
@@ -105,10 +97,10 @@ public class WingsExpressConnector implements Runnable {
             log.println("Found crnBoxes.");
             log.println(crnBoxes);
             //Add any CRNs we have into the given boxes
-            log.println("Inserting crn's given.");
+            log.println("Inserting CRN's given.");
             log.println(crns);
-            if (crns.isEmpty()){
-                log.println("Empty crn stack.");
+            if (crns.isEmpty()) {
+                log.println("Empty CRN stack.");
             }
             int i = 0;
             while (!crns.isEmpty()) {
@@ -116,22 +108,61 @@ public class WingsExpressConnector implements Runnable {
                 i++;
             }
             //Locate the submit button for CRNs
-            log.println("Located submit Crn's button.");
+            log.println("Located submit CRN's button.");
             HtmlSubmitInput submitCrns = page.getFirstByXPath("/html/body/div[4]/form/input[19]");
             log.println(submitCrns);
             //Click the submit CRNs buttons
             page = submitCrns.click();
-            log.println("Clicking submit Crn's button.");
+            log.println("Clicking submit CRN's button.");
             WebResponse response = page.getWebResponse();
             content = response.getContentAsString();
-            if (content.contains("Registration Add Errors")){
+            if (content.contains("Registration Add Errors")) {
                 log.println("CRN registration add failure");
             }
-            if (content.contains("Corequisite")){
+            if (content.contains("Corequisite")) {
                 log.println("Corequisite error");
             }
-            log.close();
-        } catch (Exception e) {}
+            log.println("End of plugin CRN's.");
+        } catch (Exception e) {
+            log.println("End of login check.");
+        }
+    }
+
+    public boolean loginTest() {
+        try {
+            log.println("Running login test.");
+            boolean failureCheck = false;
+            WebClient webClient = new WebClient();
+            HtmlPage page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_GenMnu");
+            log.println("Sucessfully connected to login page.");
+            log.println("UID box located.");
+            HtmlInput userBox = page.getFirstByXPath("//*[@id='UserID']");
+            log.println(userBox);
+            userBox.setValueAttribute(uid);
+            log.println("UID inserted.");
+            log.println("PIN box located.");
+            HtmlInput pinBox = (HtmlInput) page.getFirstByXPath("//*[@id=\"PIN\"]/input");
+            log.println(pinBox);
+            pinBox.setValueAttribute(pin);
+            log.println("PIN inserted.");
+            log.println("Located login button.");
+            HtmlSubmitInput submitButton = page.getFirstByXPath("/html/body/div[4]/form/p/input[1]");
+            log.println(submitButton);
+            submitButton.click();
+            log.println("Login button clicked. Redirecting to financial aid menu.");
+            page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_StuMainMnu");
+            WebResponse response = page.getWebResponse();
+            content = response.getContentAsString();
+            if (!content.contains("Student and Financial Aid")) {
+                failureCheck = true;
+            }
+            log.println("End of login check.");
+            log.println("Status: " + failureCheck);
+            return failureCheck;
+        } catch (Exception e) {
+            log.println("Login check encountered an exception.");
+            return true;
+        }
     }
 
     @Override
