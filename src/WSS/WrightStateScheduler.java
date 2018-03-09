@@ -77,19 +77,7 @@ public class WrightStateScheduler extends Application {
         main.add(new Label("Enter your PIN:"), 0, 4, 2, 1);
         main.add(new Label("Enter your schedule date:"), 3, 3, 3, 1);
         main.add(new Label("Enter your schedule time:"), 3, 4, 4, 1);
-        
-        main.add(scheduleTime, 5, 4, 1, 1);
-        main.add(spring, 6, 4);
-        main.add(summer, 7, 4);
-        main.add(fall, 8, 4);
-        main.add(time, 7, 0, 3, 1);
-        main.add(schedule, 3, 5, 6, 1);
-        main.add(userName, 1, 3, 2, 1);
-        main.add(password, 1, 4, 2, 1);
-        main.add(scheduleDate, 5, 3, 1, 1);
-        
-        
-        
+         
         for (int i = 0; i < 10; i++) {
             crnBoxes.add(new TextField());
             crnBoxes.get(i).setPromptText("12345");
@@ -102,6 +90,16 @@ public class WrightStateScheduler extends Application {
             crnBoxes.get(i).setTextFormatter(tf);
             main.add(crnBoxes.get(i), i, 1);
         }
+        main.add(userName, 1, 3, 2, 1);
+        main.add(password, 1, 4, 2, 1);
+        main.add(scheduleDate, 5, 3, 1, 1);
+        main.add(scheduleTime, 5, 4, 1, 1);
+        main.add(spring, 6, 4);
+        main.add(summer, 7, 4);
+        main.add(fall, 8, 4);
+        main.add(schedule, 3, 5, 6, 1);
+        main.add(time, 7, 0, 3, 1);
+        
         
         
         //verifies user input is 9 digits long
