@@ -56,8 +56,17 @@ public class WrightStateScheduler extends Application {
         scheduleTime.setPromptText("HH:MM:SS");
         scheduleTime.setTooltip(scheduleTimeTooltip);
 
-        Button schedule = new Button("Schedule!");
+        Button schedule = new Button("Schedule! (Later)");
+        Tooltip scheduleLaterTooltip = new Tooltip();
+        scheduleLaterTooltip.setText("This will schedule your classes at a specified time.");
         schedule.setMinWidth(305);
+        schedule.setTooltip(scheduleLaterTooltip);
+        
+        Button scheduleNow = new Button("Schedule! (Now)");
+        Tooltip scheduleNowTooltip = new Tooltip();
+        scheduleNowTooltip.setText("This will schedule your classes immediately.");
+        scheduleNow.setMinWidth(305);
+        scheduleNow.setTooltip(scheduleNowTooltip);
 
         ToggleGroup semesterButtons = new ToggleGroup();
         RadioButton spring = new RadioButton("Spring");
@@ -94,7 +103,8 @@ public class WrightStateScheduler extends Application {
         main.add(spring, 6, 4);
         main.add(summer, 7, 4);
         main.add(fall, 8, 4);
-        main.add(schedule, 3, 5, 6, 1);
+        main.add(scheduleNow, 1, 5, 6, 1);
+        main.add(schedule, 4, 5, 6, 1);
         main.add(time, 7, 0, 3, 1);
 
         //verifies user input is 9 digits long
@@ -188,7 +198,71 @@ public class WrightStateScheduler extends Application {
                 }
             }
         });
-
+        
+        scheduleNow.setOnAction(e -> {
+            int emptyCrnBoxes = 0;
+            for (int i = 0; i < crnBoxes.size(); i++) {
+                if (crnBoxes.get(i).getText().isEmpty()) {
+                    emptyCrnBoxes++;
+                }
+            }
+            if (userName.getText().isEmpty() || password.getText().isEmpty()) {
+                Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
+                regError.setHeaderText("Empty login");
+                regError.showAndWait();
+            } else if (scheduleDate.getText().length() < 4) {
+                Alert badDate = new Alert(AlertType.ERROR, "You must include a date following the MM/DD/YYYY format.");
+                badDate.setHeaderText("Date format error");
+                badDate.showAndWait();
+            } else if (semesterButtons.getSelectedToggle() == null) {
+                Alert noToggle = new Alert(AlertType.ERROR, "You must select a semester.");
+                noToggle.setHeaderText("Semester Selection");
+                noToggle.showAndWait();
+            } else if (emptyCrnBoxes == 10) {
+                Alert noToggle = new Alert(AlertType.ERROR, "You have not inserted any CRN's.");
+                noToggle.setHeaderText("No CRN's");
+                noToggle.showAndWait();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Submitting CRNs");
+                alert.setHeaderText(null);
+                ButtonType buttonYes = new ButtonType("Yes");
+                ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+                alert.getButtonTypes().setAll(buttonYes, buttonNo);
+                alert.setContentText("You are about to register for classes.\n"
+                        + "Please note that this program does not check for invalid CRNs.\n"
+                        + "If you wish to proceed, press yes.");
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == buttonYes) {
+                    Stack<String> crns = new Stack();
+                    for (int i = 0; i < 10; i++) {
+                        if (!crnBoxes.get(i).getText().isEmpty()) {
+                            crns.push(crnBoxes.get(i).getText());
+                        }
+                    }
+                    int semester;
+                    if (semesterButtons.getSelectedToggle() == fall) {
+                        semester = 80;
+                    } else if (semesterButtons.getSelectedToggle() == summer) {
+                        semester = 40;
+                    } else if (semesterButtons.getSelectedToggle() == spring) {
+                        semester = 30;
+                    } else {
+                        semester = 0;
+                    }
+                    String scheduleYear = scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length());
+                    WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns);
+                    if (connector.loginTest()) {
+                        Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
+                        regError.setHeaderText("Incorrect login");
+                        regError.showAndWait();
+                    } else {
+                        Thread runner = new Thread(new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns));
+                        runner.start();
+                    }
+                }
+            }
+        });
         Scene scene = new Scene(main, 1000, 200);
         stage.setScene(scene);
         stage.setResizable(false);
