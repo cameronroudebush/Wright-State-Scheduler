@@ -1,5 +1,7 @@
 package WSS;
 
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
@@ -7,8 +9,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 
 public class WingsExpressConnector implements Runnable {
@@ -27,7 +31,7 @@ public class WingsExpressConnector implements Runnable {
         this.crns = crns;
         this.log = log;
     }
-    
+
     public String getContent() {
         return content;
     }
@@ -68,9 +72,6 @@ public class WingsExpressConnector implements Runnable {
             log.println("Located semester drop down box.");
             HtmlSelect semesterDropDown = page.getFirstByXPath("//*[@id=\"term_id\"]");
             log.println(semesterDropDown);
-            if (semesterDropDown == null) {
-                log.println("Either the drop down box doesn't exist or the login info provided is incorrect.");
-            }
             //Select proper semester
             log.println("Inserting semester option.");
             log.println(semester);
@@ -121,8 +122,8 @@ public class WingsExpressConnector implements Runnable {
                 log.println("Corequisite error");
             }
             log.println("End of plugin CRN's.");
-        } catch (Exception e) {
-            log.println("End of login check.");
+        } catch (ElementNotFoundException | FailingHttpStatusCodeException | IOException e) {
+            log.println(Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -157,12 +158,80 @@ public class WingsExpressConnector implements Runnable {
             log.println("End of login check.");
             log.println("Status: " + failureCheck);
             return failureCheck;
-        } catch (Exception e) {
-            log.println("Login check encountered an exception.");
+        } catch (FailingHttpStatusCodeException | IOException e) {
+            log.println(Arrays.toString(e.getStackTrace()));
             return true;
         }
     }
-    
+
+    public boolean semesterTestNow() {
+        try {
+            boolean failureCheck = false;
+            log.println("Running semester test.");
+            WebClient webClient = new WebClient();
+            HtmlPage page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_GenMnu");
+            log.println("Sucessfully connected to login page.");
+            log.println("UID box located.");
+            HtmlInput userBox = page.getFirstByXPath("//*[@id='UserID']");
+            log.println(userBox);
+            userBox.setValueAttribute(uid);
+            log.println("UID inserted.");
+            log.println("PIN box located.");
+            HtmlInput pinBox = (HtmlInput) page.getFirstByXPath("//*[@id=\"PIN\"]/input");
+            log.println(pinBox);
+            pinBox.setValueAttribute(pin);
+            log.println("PIN inserted.");
+            log.println("Located login button.");
+            HtmlSubmitInput submitButton = page.getFirstByXPath("/html/body/div[4]/form/p/input[1]");
+            log.println(submitButton);
+            submitButton.click();
+            log.println("Login button clicked. Redirecting to add drop classes page.");
+            page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/WsuStuRegistration.P_adddropbackout");
+            log.println("Redirected successfully.");
+
+            log.println("Located semester drop down box.");
+            HtmlSelect semesterDropDown = page.getFirstByXPath("//*[@id=\"term_id\"]");
+            log.println(semesterDropDown);
+            log.println("Inserting semester option.");
+            log.println(semester);
+            try {
+                HtmlOption semesterOption = semesterDropDown.getOptionByValue(semester);
+                semesterOption.setSelected(true);
+                log.println("Setting that semester option.");
+                log.println("Located submit semester selection button.");
+                HtmlSubmitInput submitSemester = page.getFirstByXPath("/html/body/div[4]/form/input");
+                log.println(submitSemester);
+                submitSemester.click();
+                log.println("Clicking submit semester selection button.");
+            } catch (NullPointerException e) {
+                failureCheck = true;
+                log.println("End of semester test.");
+                log.println("Status: " + failureCheck);
+                return failureCheck;
+            }
+            page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/WsuStuRegistration.P_adddropbackout");
+            log.println("Redirecting to crn plug in page.");
+            ArrayList<HtmlInput> crnBoxes = new ArrayList();
+            //Load all 10 crn boxes into an arrayList for later use
+            for (int i = 1; i < 10; i++) {
+                if (page.getFirstByXPath("//*[@id=\"crn_id" + i + "\"]") != null) {
+                    crnBoxes.add((HtmlInput) page.getFirstByXPath("//*[@id=\"crn_id" + i + "\"]"));
+                }
+            }
+            if (crnBoxes.isEmpty()) {
+                failureCheck = true;
+            }
+            log.println("Found crnBoxes.");
+            log.println(crnBoxes);
+            log.println("End of semester test.");
+            log.println("Status: " + failureCheck);
+            return failureCheck;
+        } catch (ElementNotFoundException | FailingHttpStatusCodeException | IOException e) {
+            log.println(Arrays.toString(e.getStackTrace()));
+            return true;
+        }
+    }
+
     @Override
     public void run() {
         pluginCrns();

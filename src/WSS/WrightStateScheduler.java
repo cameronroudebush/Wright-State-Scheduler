@@ -3,11 +3,10 @@ package WSS;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.Timer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -260,6 +259,10 @@ public class WrightStateScheduler extends Application {
                         Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
                         regError.setHeaderText("Incorrect login");
                         regError.showAndWait();
+                    } else if (connector.semesterTestNow()) {
+                        Alert regError = new Alert(Alert.AlertType.ERROR, "The date/semester combination you have selected is not valid.");
+                        regError.setHeaderText("Date/semester combination error");
+                        regError.showAndWait();
                     } else {
                         WingsExpressConnector connectorReal = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
                         Thread runner = new Thread(connectorReal);
@@ -267,7 +270,7 @@ public class WrightStateScheduler extends Application {
                         try {
                             runner.join();
                         } catch (InterruptedException ex) {
-                            Logger.getLogger(WrightStateScheduler.class.getName()).log(Level.SEVERE, null, ex);
+                            log.println(Arrays.toString(ex.getStackTrace()));
                         }
                         String content = connectorReal.getContent();
                         if (content.contains("Registration Add Errors")) {
