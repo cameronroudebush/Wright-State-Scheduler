@@ -1,5 +1,6 @@
 package WSS;
 
+import java.io.PrintStream;
 import java.util.Stack;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -14,8 +15,9 @@ public class ScheduleWaiter implements Runnable {
     private final int semester;
     private final Stack<String> crns;
     private String content;
+    private PrintStream log;
 
-    public ScheduleWaiter(Clock currentTime, String scheduleDate, String scheduleTime, String pin, String uid, int semester, Stack<String> crns) {
+    public ScheduleWaiter(Clock currentTime, String scheduleDate, String scheduleTime, String pin, String uid, int semester, Stack<String> crns, PrintStream log) {
         this.currentTime = currentTime;
         this.scheduleDate = scheduleDate;
         this.scheduleTime = scheduleTime;
@@ -23,6 +25,7 @@ public class ScheduleWaiter implements Runnable {
         this.uid = uid;
         this.semester = semester;
         this.crns = crns;
+        this.log = log;
     }
 
     public String getContent() {
@@ -46,7 +49,7 @@ public class ScheduleWaiter implements Runnable {
         }
         try {
             String scheduleYear = scheduleDate.substring(scheduleDate.length() - 4, scheduleDate.length());
-            WingsExpressConnector connector = new WingsExpressConnector(pin, uid, scheduleYear + semester, crns);
+            WingsExpressConnector connector = new WingsExpressConnector(pin, uid, scheduleYear + semester, crns, log);
             {
                 Thread t = new Thread(connector);
                 t.start();

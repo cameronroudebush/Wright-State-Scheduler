@@ -7,7 +7,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
-import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -21,11 +20,12 @@ public class WingsExpressConnector implements Runnable {
     private String content;
     private PrintStream log;
 
-    public WingsExpressConnector(String pin, String uid, String semester, Stack<String> crns) {
+    public WingsExpressConnector(String pin, String uid, String semester, Stack<String> crns, PrintStream log) {
         this.pin = pin;
         this.uid = uid;
         this.semester = semester;
         this.crns = crns;
+        this.log = log;
     }
     
     public String getContent() {
@@ -34,7 +34,7 @@ public class WingsExpressConnector implements Runnable {
 
     public void pluginCrns() {
         try {
-            log = new PrintStream(new File("log.txt"));
+            log.println("Running CRN plugin.");
             //Generate the web client
             WebClient webClient = new WebClient();
             //Load the login page
@@ -128,7 +128,6 @@ public class WingsExpressConnector implements Runnable {
 
     public boolean loginTest() {
         try {
-            log = new PrintStream(new File("log.txt"));
             log.println("Running login test.");
             boolean failureCheck = false;
             WebClient webClient = new WebClient();

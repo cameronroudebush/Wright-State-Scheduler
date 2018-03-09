@@ -1,5 +1,7 @@
 package WSS;
 
+import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Stack;
@@ -133,7 +135,7 @@ public class WrightStateScheduler extends Application {
             return e;
         });
         scheduleTime.setTextFormatter(timeFormatter);
-
+        PrintStream log = new PrintStream(new File("log.txt"));
         schedule.setOnAction(e -> {
             int emptyCrnBoxes = 0;
             for (int i = 0; i < crnBoxes.size(); i++) {
@@ -186,14 +188,14 @@ public class WrightStateScheduler extends Application {
                         semester = 0;
                     }
                     String scheduleYear = scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length());
-                    WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns);
+                    WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
                     if (connector.loginTest()) {
                         Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
                         regError.setHeaderText("Incorrect login");
                         regError.showAndWait();
                     } else {
                         String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
-                        ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getText(), scheduleTime.getText(), password.getText(), userName.getText(), semester, crns);
+                        ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getText(), scheduleTime.getText(), password.getText(), userName.getText(), semester, crns, log);
                         Thread waiterThread = new Thread(waiter);
                         waiterThread.start();
                     }
@@ -253,13 +255,13 @@ public class WrightStateScheduler extends Application {
                         semester = 0;
                     }
                     String scheduleYear = scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length());
-                    WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns);
+                    WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
                     if (connector.loginTest()) {
                         Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
                         regError.setHeaderText("Incorrect login");
                         regError.showAndWait();
                     } else {
-                        WingsExpressConnector connectorReal = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns);
+                        WingsExpressConnector connectorReal = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
                         Thread runner = new Thread(connectorReal);
                         runner.start();
                         try {
