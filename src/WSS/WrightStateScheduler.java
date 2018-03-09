@@ -21,6 +21,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -32,12 +33,63 @@ public class WrightStateScheduler extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        GridPane main = new GridPane();
+                GridPane main = new GridPane();
         main.setPadding(new Insets(5, 5, 5, 5));
         main.setVgap(10);
         main.setHgap(20);
-        main.add(new Label("Enter CRN's Below:"), 0, 0, 5, 1);
+        
+        TextField userName = new TextField();
+        userName.setPromptText("U00123456");
+        
+        TextField time = new TextField();
+        time.setEditable(false);
+        
+        Clock clock = new Clock(time);
+        
         ArrayList<TextField> crnBoxes = new ArrayList();
+        PasswordField password = new PasswordField();
+        Timer timer = new Timer(); 
+        timer.schedule(clock, 0, 1000);
+        TextField scheduleDate = new TextField();
+        scheduleDate.setPromptText("MM/DD/YYYY");
+        
+        TextField scheduleTime = new TextField();
+        Tooltip scheduleTimeTooltip = new Tooltip();
+        scheduleTimeTooltip.setText("Please use Military time.");
+        scheduleTime.setPromptText("HH:MM:SS");
+        scheduleTime.setTooltip(scheduleTimeTooltip);
+        
+        Button schedule = new Button("Schedule!");
+        schedule.setMinWidth(305);
+        
+        ToggleGroup semesterButtons = new ToggleGroup();
+        RadioButton spring = new RadioButton("Spring");
+        RadioButton fall = new RadioButton("Fall");
+        RadioButton summer = new RadioButton("Summer");
+        
+        summer.setToggleGroup(semesterButtons);
+        spring.setToggleGroup(semesterButtons);
+        fall.setToggleGroup(semesterButtons);
+        
+        main.add(new Label("Select Semester:"), 7, 3, 3, 1);
+        main.add(new Label("Enter CRN's Below:"), 0, 0, 5, 1);
+        main.add(new Label("Enter your UID:"), 0, 3, 2, 1);
+        main.add(new Label("Enter your PIN:"), 0, 4, 2, 1);
+        main.add(new Label("Enter your schedule date:"), 3, 3, 3, 1);
+        main.add(new Label("Enter your schedule time:"), 3, 4, 4, 1);
+        
+        main.add(scheduleTime, 5, 4, 1, 1);
+        main.add(spring, 6, 4);
+        main.add(summer, 7, 4);
+        main.add(fall, 8, 4);
+        main.add(time, 7, 0, 3, 1);
+        main.add(schedule, 3, 5, 6, 1);
+        main.add(userName, 1, 3, 2, 1);
+        main.add(password, 1, 4, 2, 1);
+        main.add(scheduleDate, 5, 3, 1, 1);
+        
+        
+        
         for (int i = 0; i < 10; i++) {
             crnBoxes.add(new TextField());
             crnBoxes.get(i).setPromptText("12345");
@@ -50,9 +102,9 @@ public class WrightStateScheduler extends Application {
             crnBoxes.get(i).setTextFormatter(tf);
             main.add(crnBoxes.get(i), i, 1);
         }
-        main.add(new Label("Enter your UID:"), 0, 3, 2, 1);
-        TextField userName = new TextField();
-        userName.setPromptText("U00123456");
+        
+        
+        //verifies user input is 9 digits long
         TextFormatter<TextField> userFormatter = new TextFormatter<>(e -> {
             if (e.getControlNewText().length() > 9) {
                 return null;
@@ -60,12 +112,7 @@ public class WrightStateScheduler extends Application {
             return e;
         });
         userName.setTextFormatter(userFormatter);
-        main.add(userName, 1, 3, 2, 1);
-        main.add(new Label("Enter your PIN:"), 0, 4, 2, 1);
-        PasswordField password = new PasswordField();
-        main.add(password, 1, 4, 2, 1);
-        main.add(new Label("Enter your schedule date:"), 3, 3, 3, 1);
-        TextField scheduleDate = new TextField();
+        
         TextFormatter<TextField> dateFormatter = new TextFormatter<>(e -> {
             if (e.getControlNewText().length() > 10) {
                 return null;
@@ -73,10 +120,7 @@ public class WrightStateScheduler extends Application {
             return e;
         });
         scheduleDate.setTextFormatter(dateFormatter);
-        scheduleDate.setPromptText("MM/DD/YYYY");
-        main.add(scheduleDate, 5, 3, 1, 1);
-        main.add(new Label("Enter your schedule time:"), 3, 4, 4, 1);
-        TextField scheduleTime = new TextField();
+        
         TextFormatter<TextField> timeFormatter = new TextFormatter<>(e -> {
             if (e.getControlNewText().length() > 8) {
                 return null;
@@ -84,28 +128,8 @@ public class WrightStateScheduler extends Application {
             return e;
         });
         scheduleTime.setTextFormatter(timeFormatter);
-        scheduleTime.setPromptText("HH:MM:SS");
-        main.add(scheduleTime, 5, 4, 1, 1);
-        RadioButton spring = new RadioButton("Spring");
-        RadioButton fall = new RadioButton("Fall");
-        RadioButton summer = new RadioButton("Summer");
-        main.add(new Label("Select Semester:"), 7, 3, 3, 1);
-        main.add(spring, 6, 4);
-        main.add(summer, 7, 4);
-        main.add(fall, 8, 4);
-        ToggleGroup semesterButtons = new ToggleGroup();
-        summer.setToggleGroup(semesterButtons);
-        spring.setToggleGroup(semesterButtons);
-        fall.setToggleGroup(semesterButtons);
-        TextField time = new TextField();
-        time.setEditable(false);
-        main.add(time, 7, 0, 3, 1);
-        Timer timer = new Timer();
-        Clock clock = new Clock(time);
-        timer.schedule(clock, 0, 1000);
-        Button schedule = new Button("Schedule!");
-        schedule.setMinWidth(305);
-        main.add(schedule, 3, 5, 6, 1);
+        
+        
         schedule.setOnAction(e -> {
             int emptyCrnBoxes = 0;
             for (int i = 0; i < crnBoxes.size(); i++) {
