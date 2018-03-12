@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.Stack;
 import java.util.Timer;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -16,6 +18,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -37,6 +40,7 @@ public class WrightStateScheduler extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        GridPane timePane = new GridPane();
         GridPane main = new GridPane();
         main.setPadding(new Insets(5, 5, 5, 5));
         main.setVgap(10);
@@ -57,12 +61,27 @@ public class WrightStateScheduler extends Application {
         DatePicker scheduleDate = new DatePicker();
         scheduleDate.setEditable(false);
 
-        TextField scheduleTime = new TextField();
-        Tooltip scheduleTimeTooltip = new Tooltip();
-        scheduleTimeTooltip.setText("Please use Military time.");
-        scheduleTime.setPromptText("HH:MM:SS");
-        scheduleTime.setTooltip(scheduleTimeTooltip);
-
+        ObservableList<String> hourOptions
+                = FXCollections.observableArrayList(
+                        "01", "02", "03", "04", "05", "06", "07",
+                         "08", "09", "10", "11", "12", "13", "14",
+                         "15", "16", "17", "18", "19", "20", "21",
+                         "22", "23", "24"
+                );
+        ComboBox scheduleTimeHour = new ComboBox(hourOptions);
+        ObservableList<String> minuteOptions
+                = FXCollections.observableArrayList(
+                        "00", "01", "02", "03", "04", "05", "06", "07",
+                         "08", "09", "10", "11", "12", "13",
+                        "14", "15", "16", "17", "18", "19", "20",
+                         "31", "32", "33", "34", "35", "36", "37",
+                         "38", "39", "40", "41", "42", "43",
+                        "44", "45", "46", "47", "48", "49", "50",
+                         "51", "51", "52", "53", "54", "55", "56", "57",
+                         "58", "59", "60"
+                );
+        ComboBox scheduleTimeMinute = new ComboBox(minuteOptions);
+        ComboBox scheduleTimeSeconds = new ComboBox(minuteOptions);
         Button schedule = new Button("Schedule! (Later)");
         Tooltip scheduleLaterTooltip = new Tooltip();
         scheduleLaterTooltip.setText("This will schedule your classes at a specified time.");
@@ -84,12 +103,12 @@ public class WrightStateScheduler extends Application {
         spring.setToggleGroup(semesterButtons);
         fall.setToggleGroup(semesterButtons);
 
-        main.add(new Label("Select Semester:"), 7, 3, 3, 1);
+        main.add(new Label("Select Semester:"), 6, 3, 3, 1);
         main.add(new Label("Enter CRN's Below:"), 0, 0, 5, 1);
         main.add(new Label("Enter your UID:"), 0, 3, 2, 1);
         main.add(new Label("Enter your PIN:"), 0, 4, 2, 1);
-        main.add(new Label("Pick your schedule date:"), 3, 3, 3, 1);
-        main.add(new Label("Enter your schedule time:"), 3, 4, 4, 1);
+        main.add(new Label("Select your schedule date:"), 3, 3, 3, 1);
+        main.add(new Label("Select your schedule time:"), 3, 4, 4, 1);
 
         for (int i = 0; i < 10; i++) {
             crnBoxes.add(new TextField());
@@ -106,10 +125,13 @@ public class WrightStateScheduler extends Application {
         main.add(userName, 1, 3, 2, 1);
         main.add(password, 1, 4, 2, 1);
         main.add(scheduleDate, 5, 3, 1, 1);
-        main.add(scheduleTime, 5, 4, 1, 1);
-        main.add(spring, 6, 4);
-        main.add(summer, 7, 4);
-        main.add(fall, 8, 4);
+        timePane.add(scheduleTimeHour, 1, 1, 1, 1);
+        timePane.add(scheduleTimeMinute, 2, 1, 1, 1);
+        timePane.add(scheduleTimeSeconds, 3, 1, 1, 1);
+        main.add(timePane, 5, 4, 3, 1);
+        main.add(spring, 7, 3);
+        main.add(summer, 8, 3);
+        main.add(fall, 9, 3);
         main.add(scheduleNow, 1, 5, 6, 1);
         main.add(schedule, 5, 5, 6, 1);
         main.add(time, 7, 0, 3, 1);
@@ -123,13 +145,6 @@ public class WrightStateScheduler extends Application {
         });
         userName.setTextFormatter(userFormatter);
 
-        TextFormatter<TextField> timeFormatter = new TextFormatter<>(e -> {
-            if (e.getControlNewText().length() > 8) {
-                return null;
-            }
-            return e;
-        });
-        scheduleTime.setTextFormatter(timeFormatter);
         PrintStream log = new PrintStream(new File("log.txt"));
         schedule.setOnAction(e -> {
             int emptyCrnBoxes = 0;
@@ -190,7 +205,7 @@ public class WrightStateScheduler extends Application {
                         regError.showAndWait();
                     } else {
                         String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
-                        ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter), scheduleTime.getText(), password.getText(), userName.getText(), semester, crns, log);
+                        ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter), scheduleTimeHour.getPromptText() + ":" + scheduleTimeMinute.getPromptText() + ":" + scheduleTimeSeconds.getPromptText(), password.getText(), userName.getText(), semester, crns, log);
                         Thread waiterThread = new Thread(waiter);
                         waiterThread.start();
                     }
