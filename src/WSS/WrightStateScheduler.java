@@ -2,6 +2,7 @@ package WSS;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
@@ -34,6 +36,7 @@ public class WrightStateScheduler extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         GridPane main = new GridPane();
         main.setPadding(new Insets(5, 5, 5, 5));
         main.setVgap(10);
@@ -51,8 +54,8 @@ public class WrightStateScheduler extends Application {
         PasswordField password = new PasswordField();
         Timer timer = new Timer();
         timer.schedule(clock, 0, 1000);
-        TextField scheduleDate = new TextField();
-        scheduleDate.setPromptText("MM/DD/YYYY");
+        DatePicker scheduleDate = new DatePicker();
+        scheduleDate.setEditable(false);
 
         TextField scheduleTime = new TextField();
         Tooltip scheduleTimeTooltip = new Tooltip();
@@ -85,7 +88,7 @@ public class WrightStateScheduler extends Application {
         main.add(new Label("Enter CRN's Below:"), 0, 0, 5, 1);
         main.add(new Label("Enter your UID:"), 0, 3, 2, 1);
         main.add(new Label("Enter your PIN:"), 0, 4, 2, 1);
-        main.add(new Label("Enter your schedule date:"), 3, 3, 3, 1);
+        main.add(new Label("Pick your schedule date:"), 3, 3, 3, 1);
         main.add(new Label("Enter your schedule time:"), 3, 4, 4, 1);
 
         for (int i = 0; i < 10; i++) {
@@ -120,14 +123,6 @@ public class WrightStateScheduler extends Application {
         });
         userName.setTextFormatter(userFormatter);
 
-        TextFormatter<TextField> dateFormatter = new TextFormatter<>(e -> {
-            if (e.getControlNewText().length() > 10) {
-                return null;
-            }
-            return e;
-        });
-        scheduleDate.setTextFormatter(dateFormatter);
-
         TextFormatter<TextField> timeFormatter = new TextFormatter<>(e -> {
             if (e.getControlNewText().length() > 8) {
                 return null;
@@ -147,7 +142,7 @@ public class WrightStateScheduler extends Application {
                 Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
                 regError.setHeaderText("Empty login");
                 regError.showAndWait();
-            } else if (scheduleDate.getText().length() < 4) {
+            } else if (scheduleDate.getValue().format(dateFormatter).length() < 4) {
                 Alert badDate = new Alert(AlertType.ERROR, "You must include a date following the MM/DD/YYYY format.");
                 badDate.setHeaderText("Date format error");
                 badDate.showAndWait();
@@ -187,7 +182,7 @@ public class WrightStateScheduler extends Application {
                     } else {
                         semester = 0;
                     }
-                    String scheduleYear = scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length());
+                    String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 9);
                     WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
                     if (connector.loginTest()) {
                         Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
@@ -195,7 +190,7 @@ public class WrightStateScheduler extends Application {
                         regError.showAndWait();
                     } else {
                         String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
-                        ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getText(), scheduleTime.getText(), password.getText(), userName.getText(), semester, crns, log);
+                        ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter), scheduleTime.getText(), password.getText(), userName.getText(), semester, crns, log);
                         Thread waiterThread = new Thread(waiter);
                         waiterThread.start();
                     }
@@ -214,7 +209,7 @@ public class WrightStateScheduler extends Application {
                 Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
                 regError.setHeaderText("Empty login");
                 regError.showAndWait();
-            } else if (scheduleDate.getText().length() < 4) {
+            } else if (scheduleDate.getValue().format(dateFormatter).length() < 4) {
                 Alert badDate = new Alert(AlertType.ERROR, "You must include a date following the MM/DD/YYYY format.");
                 badDate.setHeaderText("Date format error");
                 badDate.showAndWait();
@@ -254,7 +249,7 @@ public class WrightStateScheduler extends Application {
                     } else {
                         semester = 0;
                     }
-                    String scheduleYear = scheduleDate.getText().substring(scheduleDate.getText().length() - 4, scheduleDate.getText().length());
+                    String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 9);
                     WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
                     if (connector.loginTest()) {
                         Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
@@ -271,17 +266,17 @@ public class WrightStateScheduler extends Application {
                         }
                         String content = connectorReal.getContent();
                         try {
-                        if (content.contains("Registration Add Errors")) {
-                            Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
-                            regError.setHeaderText("Registration Add Error");
-                            regError.showAndWait();
-                        }
-                        if (content.contains("Corequisite")) {
-                            Alert coReqError = new Alert(Alert.AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
-                            coReqError.setHeaderText("Corequisite Error");
-                            coReqError.showAndWait();
-                        }
-                        } catch (NullPointerException ex){
+                            if (content.contains("Registration Add Errors")) {
+                                Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
+                                regError.setHeaderText("Registration Add Error");
+                                regError.showAndWait();
+                            }
+                            if (content.contains("Corequisite")) {
+                                Alert coReqError = new Alert(Alert.AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
+                                coReqError.setHeaderText("Corequisite Error");
+                                coReqError.showAndWait();
+                            }
+                        } catch (NullPointerException ex) {
                             Alert coReqError = new Alert(Alert.AlertType.ERROR, "The date/semester combination you have selected does not work. Scheduling failed.");
                             coReqError.setHeaderText("Semester/Date selection error");
                             coReqError.showAndWait();
