@@ -259,10 +259,6 @@ public class WrightStateScheduler extends Application {
                         Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
                         regError.setHeaderText("Incorrect login");
                         regError.showAndWait();
-                    } else if (connector.semesterTestNow()) {
-                        Alert regError = new Alert(Alert.AlertType.ERROR, "The date/semester combination you have selected is not valid.");
-                        regError.setHeaderText("Date/semester combination error");
-                        regError.showAndWait();
                     } else {
                         WingsExpressConnector connectorReal = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
                         Thread runner = new Thread(connectorReal);
@@ -273,6 +269,7 @@ public class WrightStateScheduler extends Application {
                             log.println(Arrays.toString(ex.getStackTrace()));
                         }
                         String content = connectorReal.getContent();
+                        try {
                         if (content.contains("Registration Add Errors")) {
                             Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
                             regError.setHeaderText("Registration Add Error");
@@ -283,6 +280,11 @@ public class WrightStateScheduler extends Application {
                             coReqError.setHeaderText("Corequisite Error");
                             coReqError.showAndWait();;
                         }
+                        } catch (NullPointerException ex){
+                            Alert coReqError = new Alert(Alert.AlertType.ERROR, "The date/semester combination you have selected does not work. Scheduling failed.");
+                            coReqError.setHeaderText("Semester/Date selection error");
+                            coReqError.showAndWait();;
+                        }
                     }
                 }
             }
@@ -290,7 +292,7 @@ public class WrightStateScheduler extends Application {
         Scene scene = new Scene(main, 1000, 200);
         stage.setScene(scene);
         stage.setResizable(false);
-        stage.setTitle("Wright State Schedular");
+        stage.setTitle("Wright State Scheduler");
         stage.show();
         stage.setOnCloseRequest(e -> {
             System.exit(0);
