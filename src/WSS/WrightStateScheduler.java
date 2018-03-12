@@ -47,6 +47,7 @@ public class WrightStateScheduler extends Application {
         GridPane main = new GridPane();
         main.setPadding(new Insets(5, 5, 5, 5));
         semesterPane.setHgap(10);
+        timePane.setHgap(10);
         main.setVgap(10);
         main.setHgap(20);
 
@@ -78,9 +79,7 @@ public class WrightStateScheduler extends Application {
         ObservableList<String> hourOptions
                 = FXCollections.observableArrayList(
                         "01", "02", "03", "04", "05", "06", "07",
-                         "08", "09", "10", "11", "12", "13", "14",
-                         "15", "16", "17", "18", "19", "20", "21",
-                         "22", "23", "24"
+                         "08", "09", "10", "11", "12"
                 );
         ComboBox scheduleTimeHour = new ComboBox(hourOptions);
         ObservableList<String> options
@@ -116,7 +115,15 @@ public class WrightStateScheduler extends Application {
         summer.setToggleGroup(semesterButtons);
         spring.setToggleGroup(semesterButtons);
         fall.setToggleGroup(semesterButtons);
-
+        
+        ToggleGroup meridiem = new ToggleGroup();
+        RadioButton am = new RadioButton("AM");
+        RadioButton pm = new RadioButton("PM");
+        
+        am.setToggleGroup(meridiem);
+        pm.setToggleGroup(meridiem);
+        meridiem.selectToggle(am);
+        
         semesterPane.add(new Label("Select Semester:"), 1, 1);
         main.add(new Label("Enter CRN's Below:"), 0, 0, 5, 1);
         main.add(new Label("Enter your UID:"), 0, 3, 2, 1);
@@ -142,7 +149,9 @@ public class WrightStateScheduler extends Application {
         timePane.add(scheduleTimeHour, 1, 1, 1, 1);
         timePane.add(scheduleTimeMinute, 2, 1, 1, 1);
         timePane.add(scheduleTimeSeconds, 3, 1, 1, 1);
-        main.add(timePane, 4, 4, 3, 1);
+        timePane.add(am, 4, 1);
+        timePane.add(pm, 5, 1);
+        main.add(timePane, 4, 4, 5, 1);
         semesterPane.add(spring, 2, 1);
         semesterPane.add(summer, 3, 1);
         semesterPane.add(fall, 4, 1);
@@ -220,7 +229,16 @@ public class WrightStateScheduler extends Application {
                         regError.showAndWait();
                     } else {
                         String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
-                        ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter), scheduleTimeHour.getPromptText() + ":" + scheduleTimeMinute.getPromptText() + ":" + scheduleTimeSeconds.getPromptText(), password.getText(), userName.getText(), semester, crns, log);
+                        String selectedMeridiem;
+                        if (meridiem.getSelectedToggle() == am){
+                            selectedMeridiem = "AM";
+                        }
+                        else {
+                            selectedMeridiem = "PM";
+                        }
+                        String timeToSchedule = scheduleTimeHour.getSelectionModel().getSelectedItem().toString() + ":" + scheduleTimeMinute.getSelectionModel().getSelectedItem().toString() + ":" + 
+                                scheduleTimeSeconds.getSelectionModel().getSelectedItem().toString() + " " + selectedMeridiem;
+                        ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter), timeToSchedule, password.getText(), userName.getText(), semester, crns, log);
                         Thread waiterThread = new Thread(waiter);
                         waiterThread.start();
                     }
