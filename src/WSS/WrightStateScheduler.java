@@ -22,6 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -278,12 +279,12 @@ public class WrightStateScheduler extends Application {
                         if (content.contains("Corequisite")) {
                             Alert coReqError = new Alert(Alert.AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
                             coReqError.setHeaderText("Corequisite Error");
-                            coReqError.showAndWait();;
+                            coReqError.showAndWait();
                         }
                         } catch (NullPointerException ex){
                             Alert coReqError = new Alert(Alert.AlertType.ERROR, "The date/semester combination you have selected does not work. Scheduling failed.");
                             coReqError.setHeaderText("Semester/Date selection error");
-                            coReqError.showAndWait();;
+                            coReqError.showAndWait();
                         }
                     }
                 }
@@ -293,6 +294,7 @@ public class WrightStateScheduler extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.setTitle("Wright State Scheduler");
+        stage.getIcons().add(new Image("/Media/Logo.png"));
         stage.show();
         stage.setOnCloseRequest(e -> {
             System.exit(0);
