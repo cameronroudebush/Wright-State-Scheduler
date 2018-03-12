@@ -1,5 +1,7 @@
 package WSS;
 
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
@@ -7,8 +9,10 @@ import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 
 public class WingsExpressConnector implements Runnable {
@@ -27,7 +31,7 @@ public class WingsExpressConnector implements Runnable {
         this.crns = crns;
         this.log = log;
     }
-    
+
     public String getContent() {
         return content;
     }
@@ -68,9 +72,6 @@ public class WingsExpressConnector implements Runnable {
             log.println("Located semester drop down box.");
             HtmlSelect semesterDropDown = page.getFirstByXPath("//*[@id=\"term_id\"]");
             log.println(semesterDropDown);
-            if (semesterDropDown == null) {
-                log.println("Either the drop down box doesn't exist or the login info provided is incorrect.");
-            }
             //Select proper semester
             log.println("Inserting semester option.");
             log.println(semester);
@@ -121,8 +122,8 @@ public class WingsExpressConnector implements Runnable {
                 log.println("Corequisite error");
             }
             log.println("End of plugin CRN's.");
-        } catch (Exception e) {
-            log.println("End of login check.");
+        } catch (ElementNotFoundException | FailingHttpStatusCodeException | IOException e) {
+            log.println(Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -157,12 +158,12 @@ public class WingsExpressConnector implements Runnable {
             log.println("End of login check.");
             log.println("Status: " + failureCheck);
             return failureCheck;
-        } catch (Exception e) {
-            log.println("Login check encountered an exception.");
+        } catch (FailingHttpStatusCodeException | IOException e) {
+            log.println(Arrays.toString(e.getStackTrace()));
             return true;
         }
     }
-    
+
     @Override
     public void run() {
         pluginCrns();

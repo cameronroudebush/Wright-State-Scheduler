@@ -16,6 +16,7 @@ public class ScheduleWaiter implements Runnable {
     private final Stack<String> crns;
     private String content;
     private PrintStream log;
+    private boolean errorFound = false;
 
     public ScheduleWaiter(Clock currentTime, String scheduleDate, String scheduleTime, String pin, String uid, int semester, Stack<String> crns, PrintStream log) {
         this.currentTime = currentTime;
@@ -35,14 +36,18 @@ public class ScheduleWaiter implements Runnable {
     private void comparisonWaiter() {
         while (!currentTime.getCurrentDateAndTime().substring(14, 24).equals(scheduleDate)) {
             try {
-                System.out.println("Hit wait command on date.");
+                log.println("Hit wait command on date.");
+                log.print(currentTime.getCurrentDateAndTime() + " " + scheduleDate);
+                log.println();
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
             }
         }
         while (!currentTime.getCurrentDateAndTime().substring(25, currentTime.getCurrentDateAndTime().length()).equals(scheduleTime)) {
             try {
-                System.out.println("Hit wait command on time.");
+                log.println("Hit wait command on time.");
+                log.print(currentTime.getCurrentDateAndTime() + " " + scheduleTime);
+                log.println();
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
             }
@@ -58,14 +63,28 @@ public class ScheduleWaiter implements Runnable {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (content.contains("Registration Add Errors")) {
-                            Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
-                            regError.setHeaderText("Registration Add Error");
-                            regError.showAndWait();
-                        }
-                        if (content.contains("Corequisite")) {
-                            Alert coReqError = new Alert(Alert.AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
-                            coReqError.setHeaderText("Corequisite Error");
+                        try {
+                            if (content.contains("Registration Add Errors")) {
+                                errorFound = true;
+                                Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
+                                regError.setHeaderText("Registration Add Error");
+                                regError.showAndWait();
+                            }
+                            if (content.contains("Corequisite")) {
+                                errorFound = true;
+                                Alert coReqError = new Alert(Alert.AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
+                                coReqError.setHeaderText("Corequisite Error");
+                                coReqError.showAndWait();
+                            }
+                            if (!errorFound){
+                                Alert winner = new Alert(Alert.AlertType.CONFIRMATION, "The schedular seemed to have completed without any errors. We do recommend you double check with WingsExpress to be sure but it looks good on our end! \n Thanks for using WSS!");
+                                winner.setHeaderText("You Made it!");
+                                winner.setTitle("Congratulations!");
+                                winner.showAndWait();
+                            }
+                        } catch (NullPointerException e) {
+                            Alert coReqError = new Alert(Alert.AlertType.ERROR, "The date/semester combination you have selected does not work. Scheduling failed.");
+                            coReqError.setHeaderText("Semester/Date selection error");
                             coReqError.showAndWait();;
                         }
                     }

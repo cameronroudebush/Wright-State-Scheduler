@@ -28,7 +28,7 @@ public class Clock extends TimerTask {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    DateFormat dateAndTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+                    DateFormat dateAndTime = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
                     Date date = new Date();
                     try{
                     currentDateAndTime.setText("Current Time: " + dateAndTime.format(date));
