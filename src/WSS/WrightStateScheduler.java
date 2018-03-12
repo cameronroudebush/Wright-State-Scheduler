@@ -2,6 +2,10 @@ package WSS;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -69,29 +73,31 @@ public class WrightStateScheduler extends Application {
         scheduleDate.setDayCellFactory(picker -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
-                            super.updateItem(date, empty);
-                            if (date.isBefore(LocalDate.now())){
-                                    setDisable(true);
                             }  
+                super.updateItem(date, empty);
+                if (date.isBefore(LocalDate.now())) {
+                    setDisable(true);
+                }
             }
         });
 
         ObservableList<String> hourOptions
                 = FXCollections.observableArrayList(
                         "01", "02", "03", "04", "05", "06", "07",
-                         "08", "09", "10", "11", "12"
+                        "08", "09", "10", "11", "12"
                 );
         ComboBox scheduleTimeHour = new ComboBox(hourOptions);
         ObservableList<String> options
                 = FXCollections.observableArrayList(
                         "00", "01", "02", "03", "04", "05", "06", "07",
-                         "08", "09", "10", "11", "12", "13",
+                        "08", "09", "10", "11", "12", "13",
                         "14", "15", "16", "17", "18", "19", "20",
-                         "31", "32", "33", "34", "35", "36", "37",
-                         "38", "39", "40", "41", "42", "43",
-                        "44", "45", "46", "47", "48", "49", "50",
-                         "51", "51", "52", "53", "54", "55", "56", "57",
-                         "58", "59", "60"
+                        "21", "22", "23", "24", "25", "26", "27",
+                        "28", "29", "30", "31", "32", "33", "34",
+                        "35", "36", "37", "38", "39", "40", "41",
+                        "42", "43", "44", "45", "46", "47", "48",
+                        "49", "50", "51", "51", "52", "53", "54",
+                        "55", "56", "57", "58", "59"
                 );
         ComboBox scheduleTimeMinute = new ComboBox(options);
         ComboBox scheduleTimeSeconds = new ComboBox(options);
@@ -115,15 +121,15 @@ public class WrightStateScheduler extends Application {
         summer.setToggleGroup(semesterButtons);
         spring.setToggleGroup(semesterButtons);
         fall.setToggleGroup(semesterButtons);
-        
+
         ToggleGroup meridiem = new ToggleGroup();
         RadioButton am = new RadioButton("AM");
         RadioButton pm = new RadioButton("PM");
-        
+
         am.setToggleGroup(meridiem);
         pm.setToggleGroup(meridiem);
         meridiem.selectToggle(am);
-        
+
         semesterPane.add(new Label("Select Semester:"), 1, 1);
         main.add(new Label("Enter CRN's Below:"), 0, 0, 5, 1);
         main.add(new Label("Enter your UID:"), 0, 3, 2, 1);
@@ -151,11 +157,11 @@ public class WrightStateScheduler extends Application {
         timePane.add(scheduleTimeSeconds, 3, 1, 1, 1);
         timePane.add(am, 4, 1);
         timePane.add(pm, 5, 1);
-        main.add(timePane, 4, 4, 5, 1);
         semesterPane.add(spring, 2, 1);
         semesterPane.add(summer, 3, 1);
         semesterPane.add(fall, 4, 1);
-        main.add(semesterPane, 6 , 3, 4, 1);
+        main.add(semesterPane, 6, 3, 4, 1);
+        main.add(timePane, 4, 4, 5, 1);
         main.add(scheduleNow, 1, 5, 6, 1);
         main.add(schedule, 5, 5, 6, 1);
         main.add(time, 7, 0, 3, 1);
@@ -172,81 +178,105 @@ public class WrightStateScheduler extends Application {
         PrintStream log = new PrintStream(new File("log.txt"));
         schedule.setOnAction(e -> {
             int emptyCrnBoxes = 0;
-            for (int i = 0; i < crnBoxes.size(); i++) {
-                if (crnBoxes.get(i).getText().isEmpty()) {
-                    emptyCrnBoxes++;
-                }
-            }
-            if (userName.getText().isEmpty() || password.getText().isEmpty()) {
-                Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
-                regError.setHeaderText("Empty login");
-                regError.showAndWait();
-            } else if (scheduleDate.getValue().format(dateFormatter).length() < 4) {
-                Alert badDate = new Alert(AlertType.ERROR, "You must include a date following the MM/DD/YYYY format.");
-                badDate.setHeaderText("Date format error");
-                badDate.showAndWait();
-            } else if (semesterButtons.getSelectedToggle() == null) {
-                Alert noToggle = new Alert(AlertType.ERROR, "You must select a semester.");
-                noToggle.setHeaderText("Semester Selection");
-                noToggle.showAndWait();
-            } else if (emptyCrnBoxes == 10) {
-                Alert noToggle = new Alert(AlertType.ERROR, "You have not inserted any CRN's.");
-                noToggle.setHeaderText("No CRN's");
-                noToggle.showAndWait();
+            String selectedMeridiem;
+            if (meridiem.getSelectedToggle() == am) {
+                selectedMeridiem = "AM";
             } else {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Submitting CRNs");
-                alert.setHeaderText(null);
-                ButtonType buttonYes = new ButtonType("Yes");
-                ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
-                alert.getButtonTypes().setAll(buttonYes, buttonNo);
-                alert.setContentText("You are about to register for classes.\n"
-                        + "Please note that this program does not check for invalid CRNs.\n"
-                        + "If you wish to proceed, press yes.");
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.get() == buttonYes) {
-                    Stack<String> crns = new Stack();
-                    for (int i = 0; i < 10; i++) {
-                        if (!crnBoxes.get(i).getText().isEmpty()) {
-                            crns.push(crnBoxes.get(i).getText());
-                        }
+                selectedMeridiem = "PM";
+            }
+
+            if (scheduleTimeHour.getSelectionModel().getSelectedItem() == null || scheduleTimeMinute.getSelectionModel().getSelectedItem() == null || scheduleTimeSeconds.getSelectionModel().getSelectedItem() == null) {
+                Alert tooLate = new Alert(AlertType.ERROR, "Please make sure to fill in all of the time drop down boxes!");
+                tooLate.setHeaderText("Time error");
+                tooLate.showAndWait();
+            } else {
+                String timeToSchedule = scheduleTimeHour.getSelectionModel().getSelectedItem().toString() + ":" + scheduleTimeMinute.getSelectionModel().getSelectedItem().toString() + ":"
+                        + scheduleTimeSeconds.getSelectionModel().getSelectedItem().toString() + " " + selectedMeridiem;
+                for (int i = 0; i < crnBoxes.size(); i++) {
+                    if (crnBoxes.get(i).getText().isEmpty()) {
+                        emptyCrnBoxes++;
                     }
-                    int semester;
-                    if (semesterButtons.getSelectedToggle() == fall) {
-                        semester = 80;
-                    } else if (semesterButtons.getSelectedToggle() == summer) {
-                        semester = 40;
-                    } else if (semesterButtons.getSelectedToggle() == spring) {
-                        semester = 30;
-                    } else {
-                        semester = 0;
-                    }
-                    String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 9);
-                    WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
-                    if (connector.loginTest()) {
-                        Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
-                        regError.setHeaderText("Incorrect login");
-                        regError.showAndWait();
-                    } else {
-                        String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
-                        String selectedMeridiem;
-                        if (meridiem.getSelectedToggle() == am){
-                            selectedMeridiem = "AM";
+                }
+                DateFormat formater = new SimpleDateFormat("hh:mm:ss a");
+                Time currentTimeFormat = null;
+                Time timeToScheduleFormat = null;
+                try {
+                    timeToScheduleFormat = new Time((formater.parse(timeToSchedule).getTime()));
+                    currentTimeFormat = new Time((formater.parse(clock.getCurrentDateAndTime().substring(25, clock.getCurrentDateAndTime().length())).getTime()));
+                } catch (ParseException ex) {
+                    log.println("Parse error for checking dates");
+                    log.print(ex.toString());
+                    log.println();
+                }
+
+                if (userName.getText().isEmpty() || password.getText().isEmpty()) {
+                    Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
+                    regError.setHeaderText("Empty login");
+                    regError.showAndWait();
+                } else if (scheduleDate.getValue().format(dateFormatter).length() < 4) {
+                    Alert badDate = new Alert(AlertType.ERROR, "You must include a date following the MM/DD/YYYY format.");
+                    badDate.setHeaderText("Date format error");
+                    badDate.showAndWait();
+                } else if (semesterButtons.getSelectedToggle() == null) {
+                    Alert noToggle = new Alert(AlertType.ERROR, "You must select a semester.");
+                    noToggle.setHeaderText("Semester Selection");
+                    noToggle.showAndWait();
+                } else if (emptyCrnBoxes == 10) {
+                    Alert noToggle = new Alert(AlertType.ERROR, "You have not inserted any CRN's.");
+                    noToggle.setHeaderText("No CRN's");
+                    noToggle.showAndWait();
+                } else if (timeToScheduleFormat.before(currentTimeFormat)) {
+                    Alert tooLate = new Alert(AlertType.ERROR, "The time you have selected has already passed. Please select a new time.");
+                    tooLate.setHeaderText("The time has passed");
+                    tooLate.showAndWait();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Submitting CRNs");
+                    alert.setHeaderText(null);
+                    ButtonType buttonYes = new ButtonType("Yes");
+                    ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+                    alert.getButtonTypes().setAll(buttonYes, buttonNo);
+                    alert.setContentText("You are about to register for classes.\n"
+                            + "Please note that this program does not check for invalid CRNs.\n"
+                            + "If you wish to proceed, press yes.");
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.get() == buttonYes) {
+                        Stack<String> crns = new Stack();
+                        for (int i = 0; i < 10; i++) {
+                            if (!crnBoxes.get(i).getText().isEmpty()) {
+                                crns.push(crnBoxes.get(i).getText());
+                            }
                         }
-                        else {
-                            selectedMeridiem = "PM";
+                        int semester;
+                        if (semesterButtons.getSelectedToggle() == fall) {
+                            semester = 80;
+                        } else if (semesterButtons.getSelectedToggle() == summer) {
+                            semester = 40;
+                        } else if (semesterButtons.getSelectedToggle() == spring) {
+                            semester = 30;
+                        } else {
+                            semester = 0;
                         }
-                        String timeToSchedule = scheduleTimeHour.getSelectionModel().getSelectedItem().toString() + ":" + scheduleTimeMinute.getSelectionModel().getSelectedItem().toString() + ":" + 
-                                scheduleTimeSeconds.getSelectionModel().getSelectedItem().toString() + " " + selectedMeridiem;
-                        ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter), timeToSchedule, password.getText(), userName.getText(), semester, crns, log);
-                        Thread waiterThread = new Thread(waiter);
-                        waiterThread.start();
+                        String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 9);
+                        WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
+                        if (connector.loginTest()) {
+                            Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
+                            regError.setHeaderText("Incorrect login");
+                            regError.showAndWait();
+                        } else {
+                            String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
+                            ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter), timeToSchedule, password.getText(), userName.getText(), semester, crns, log);
+                            Thread waiterThread = new Thread(waiter);
+                            waiterThread.start();
+                        }
                     }
                 }
             }
-        });
+        }
+        );
 
-        scheduleNow.setOnAction(e -> {
+        scheduleNow.setOnAction(e
+                -> {
             int emptyCrnBoxes = 0;
             for (int i = 0; i < crnBoxes.size(); i++) {
                 if (crnBoxes.get(i).getText().isEmpty()) {
@@ -297,7 +327,7 @@ public class WrightStateScheduler extends Application {
                     } else {
                         semester = 0;
                     }
-                    String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 9);
+                    String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 10);
                     WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
                     if (connector.loginTest()) {
                         Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
@@ -332,15 +362,18 @@ public class WrightStateScheduler extends Application {
                     }
                 }
             }
-        });
+        }
+        );
         Scene scene = new Scene(main, 1000, 200);
         stage.setScene(scene);
         stage.setResizable(false);
         stage.setTitle("Wright State Scheduler");
         stage.getIcons().add(new Image("/Media/Icon.png"));
         stage.show();
+
         stage.setOnCloseRequest(e -> {
             System.exit(0);
-        });
+        }
+        );
     }
 }
