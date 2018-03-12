@@ -2,6 +2,7 @@ package WSS;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -41,8 +43,10 @@ public class WrightStateScheduler extends Application {
     public void start(Stage stage) throws Exception {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         GridPane timePane = new GridPane();
+        GridPane semesterPane = new GridPane();
         GridPane main = new GridPane();
         main.setPadding(new Insets(5, 5, 5, 5));
+        semesterPane.setHgap(10);
         main.setVgap(10);
         main.setHgap(20);
 
@@ -60,6 +64,16 @@ public class WrightStateScheduler extends Application {
         timer.schedule(clock, 0, 1000);
         DatePicker scheduleDate = new DatePicker();
         scheduleDate.setEditable(false);
+        scheduleDate.setValue(LocalDate.now());
+        scheduleDate.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                            super.updateItem(date, empty);
+                            if (date.isBefore(LocalDate.now())){
+                                    setDisable(true);
+                            }  
+            }
+        });
 
         ObservableList<String> hourOptions
                 = FXCollections.observableArrayList(
@@ -69,7 +83,7 @@ public class WrightStateScheduler extends Application {
                          "22", "23", "24"
                 );
         ComboBox scheduleTimeHour = new ComboBox(hourOptions);
-        ObservableList<String> minuteOptions
+        ObservableList<String> options
                 = FXCollections.observableArrayList(
                         "00", "01", "02", "03", "04", "05", "06", "07",
                          "08", "09", "10", "11", "12", "13",
@@ -80,8 +94,8 @@ public class WrightStateScheduler extends Application {
                          "51", "51", "52", "53", "54", "55", "56", "57",
                          "58", "59", "60"
                 );
-        ComboBox scheduleTimeMinute = new ComboBox(minuteOptions);
-        ComboBox scheduleTimeSeconds = new ComboBox(minuteOptions);
+        ComboBox scheduleTimeMinute = new ComboBox(options);
+        ComboBox scheduleTimeSeconds = new ComboBox(options);
         Button schedule = new Button("Schedule! (Later)");
         Tooltip scheduleLaterTooltip = new Tooltip();
         scheduleLaterTooltip.setText("This will schedule your classes at a specified time.");
@@ -103,12 +117,12 @@ public class WrightStateScheduler extends Application {
         spring.setToggleGroup(semesterButtons);
         fall.setToggleGroup(semesterButtons);
 
-        main.add(new Label("Select Semester:"), 6, 3, 3, 1);
+        semesterPane.add(new Label("Select Semester:"), 1, 1);
         main.add(new Label("Enter CRN's Below:"), 0, 0, 5, 1);
         main.add(new Label("Enter your UID:"), 0, 3, 2, 1);
         main.add(new Label("Enter your PIN:"), 0, 4, 2, 1);
-        main.add(new Label("Select your schedule date:"), 3, 3, 3, 1);
-        main.add(new Label("Select your schedule time:"), 3, 4, 4, 1);
+        main.add(new Label("Schedule date:"), 3, 3, 2, 1);
+        main.add(new Label("Schedule time:"), 3, 4, 2, 1);
 
         for (int i = 0; i < 10; i++) {
             crnBoxes.add(new TextField());
@@ -124,14 +138,15 @@ public class WrightStateScheduler extends Application {
         }
         main.add(userName, 1, 3, 2, 1);
         main.add(password, 1, 4, 2, 1);
-        main.add(scheduleDate, 5, 3, 1, 1);
+        main.add(scheduleDate, 4, 3, 2, 1);
         timePane.add(scheduleTimeHour, 1, 1, 1, 1);
         timePane.add(scheduleTimeMinute, 2, 1, 1, 1);
         timePane.add(scheduleTimeSeconds, 3, 1, 1, 1);
-        main.add(timePane, 5, 4, 3, 1);
-        main.add(spring, 7, 3);
-        main.add(summer, 8, 3);
-        main.add(fall, 9, 3);
+        main.add(timePane, 4, 4, 3, 1);
+        semesterPane.add(spring, 2, 1);
+        semesterPane.add(summer, 3, 1);
+        semesterPane.add(fall, 4, 1);
+        main.add(semesterPane, 6 , 3, 4, 1);
         main.add(scheduleNow, 1, 5, 6, 1);
         main.add(schedule, 5, 5, 6, 1);
         main.add(time, 7, 0, 3, 1);
