@@ -304,7 +304,7 @@ public class WrightStateScheduler extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.setTitle("Wright State Scheduler");
-        stage.getIcons().add(new Image("/Media/Logo.png"));
+        stage.getIcons().add(new Image("/Media/Icon.png"));
         stage.show();
         stage.setOnCloseRequest(e -> {
             System.exit(0);
