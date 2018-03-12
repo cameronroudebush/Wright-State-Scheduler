@@ -369,6 +369,14 @@ public class WrightStateScheduler extends Application {
         stage.setTitle("Wright State Scheduler");
         stage.getIcons().add(new Image("/Media/Icon.png"));
         stage.show();
+        Alert welcome = new Alert(AlertType.INFORMATION, "Welcome to WSS! Your one stop shop to get some more sleep! "
+                + "Now we know that you won't be getting more sleep until you trust the program but thank you for being our beta testers! "
+                + "If everything goes well you could be saving yourself some sleep in no time. If you have any questions or concerns"
+                + " please email me at roudebushcameron@gmail.com. Also be ready with those log files as I will want them to see how everything went!"
+                + " \n\n Thanks again for your help! \n -Cameron ");
+        welcome.setHeaderText("Welcome!");
+        welcome.setTitle("WSS");
+        welcome.showAndWait();
 
         stage.setOnCloseRequest(e -> {
             System.exit(0);
