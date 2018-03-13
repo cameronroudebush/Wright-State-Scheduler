@@ -38,7 +38,7 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class WrightStateScheduler extends Application {
-    
+
     public static void main(String[] args) {
         Application.launch(args);
     }
@@ -62,7 +62,7 @@ public class WrightStateScheduler extends Application {
         TextField time = new TextField();
         time.setEditable(false);
 
-        Clock clock = new Clock(time,log);
+        Clock clock = new Clock(time, log);
 
         ArrayList<TextField> crnBoxes = new ArrayList();
         PasswordField password = new PasswordField();
@@ -243,31 +243,31 @@ public class WrightStateScheduler extends Application {
                     tooLate.setHeaderText("The time has passed");
                     tooLate.showAndWait();
                 } else {
-                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                    alert.setTitle("Submitting CRNs");
-                    alert.setHeaderText(null);
-                    ButtonType buttonYes = new ButtonType("Yes");
-                    ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
-                    alert.getButtonTypes().setAll(buttonYes, buttonNo);
-                    alert.setContentText("All preliminary tests have passed but please note this program does not test for valid CRN numbers. "
-                            + "Currently you will be registering for the following date/semester and time: \n"
-                            + scheduleDate.getValue().format(dateFormatter) + " " + semesterString + " " + timeToSchedule
-                            + "\nIf you would like to continue with this info press yes. If something looks wrong press no and please correct it.");
-                    Optional<ButtonType> result = alert.showAndWait();
-                    if (result.get() == buttonYes) {
-                        Stack<String> crns = new Stack();
-                        for (int i = 0; i < 10; i++) {
-                            if (!crnBoxes.get(i).getText().isEmpty()) {
-                                crns.push(crnBoxes.get(i).getText());
+                    String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 9);
+                    WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, log);
+                    if (connector.loginTest()) {
+                        Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
+                        regError.setHeaderText("Incorrect login");
+                        regError.showAndWait();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Submit?");
+                        alert.setHeaderText(null);
+                        ButtonType buttonYes = new ButtonType("Yes");
+                        ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+                        alert.getButtonTypes().setAll(buttonYes, buttonNo);
+                        alert.setContentText("All preliminary tests have passed but please note this program does not test for valid CRN numbers. "
+                                + "Currently you will be registering for the following date/semester and time: \n"
+                                + scheduleDate.getValue().format(dateFormatter) + " " + semesterString + " " + timeToSchedule
+                                + "\nIf you would like to continue with this info press yes. If something looks wrong press no and please correct it.");
+                        Optional<ButtonType> result = alert.showAndWait();
+                        if (result.get() == buttonYes) {
+                            Stack<String> crns = new Stack();
+                            for (int i = 0; i < 10; i++) {
+                                if (!crnBoxes.get(i).getText().isEmpty()) {
+                                    crns.push(crnBoxes.get(i).getText());
+                                }
                             }
-                        }
-                        String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 9);
-                        WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
-                        if (connector.loginTest()) {
-                            Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
-                            regError.setHeaderText("Incorrect login");
-                            regError.showAndWait();
-                        } else {
                             String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
                             ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter), timeToSchedule, password.getText(), userName.getText(), semester, crns, log);
                             Thread waiterThread = new Thread(waiter);
@@ -318,31 +318,31 @@ public class WrightStateScheduler extends Application {
                 noToggle.setHeaderText("No CRN's");
                 noToggle.showAndWait();
             } else {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Submit?");
-                alert.setHeaderText(null);
-                ButtonType buttonYes = new ButtonType("Yes");
-                ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
-                alert.getButtonTypes().setAll(buttonYes, buttonNo);
-                alert.setContentText("All preliminary tests have passed but please note this program does not test for valid CRN numbers. "
-                        + "Currently you will be registering for the following date/semester: \n"
-                        + scheduleDate.getValue().format(dateFormatter) + " " + semesterString
-                        + "\nIf you would like to continue with this info press yes. If something looks wrong press no and please correct it.");
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.get() == buttonYes) {
-                    Stack<String> crns = new Stack();
-                    for (int i = 0; i < 10; i++) {
-                        if (!crnBoxes.get(i).getText().isEmpty()) {
-                            crns.push(crnBoxes.get(i).getText());
+                String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 10);
+                WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, log);
+                if (connector.loginTest()) {
+                    Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
+                    regError.setHeaderText("Incorrect login");
+                    regError.showAndWait();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                    alert.setTitle("Submit?");
+                    alert.setHeaderText(null);
+                    ButtonType buttonYes = new ButtonType("Yes");
+                    ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+                    alert.getButtonTypes().setAll(buttonYes, buttonNo);
+                    alert.setContentText("All preliminary tests have passed but please note this program does not test for valid CRN numbers. "
+                            + "Currently you will be registering for the following date/semester: \n"
+                            + scheduleDate.getValue().format(dateFormatter) + " " + semesterString
+                            + "\nIf you would like to continue with this info press yes. If something looks wrong press no and please correct it.");
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.get() == buttonYes) {
+                        Stack<String> crns = new Stack();
+                        for (int i = 0; i < 10; i++) {
+                            if (!crnBoxes.get(i).getText().isEmpty()) {
+                                crns.push(crnBoxes.get(i).getText());
+                            }
                         }
-                    }
-                    String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 10);
-                    WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
-                    if (connector.loginTest()) {
-                        Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
-                        regError.setHeaderText("Incorrect login");
-                        regError.showAndWait();
-                    } else {
                         WingsExpressConnector connectorReal = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
                         Thread runner = new Thread(connectorReal);
                         runner.start();
