@@ -178,6 +178,20 @@ public class WrightStateScheduler extends Application {
         schedule.setOnAction(e -> {
             int emptyCrnBoxes = 0;
             String selectedMeridiem;
+            String semesterString = "";
+            int semester;
+            if (semesterButtons.getSelectedToggle() == fall) {
+                semester = 80;
+                semesterString = "fall";
+            } else if (semesterButtons.getSelectedToggle() == summer) {
+                semester = 40;
+                semesterString = "Summer";
+            } else if (semesterButtons.getSelectedToggle() == spring) {
+                semester = 30;
+                semesterString = "Spring";
+            } else {
+                semester = 0;
+            }
             if (meridiem.getSelectedToggle() == am) {
                 selectedMeridiem = "AM";
             } else {
@@ -235,9 +249,10 @@ public class WrightStateScheduler extends Application {
                     ButtonType buttonYes = new ButtonType("Yes");
                     ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
                     alert.getButtonTypes().setAll(buttonYes, buttonNo);
-                    alert.setContentText("You are about to register for classes.\n"
-                            + "Please note that this program does not check for invalid CRNs.\n"
-                            + "If you wish to proceed, press yes.");
+                    alert.setContentText("All preliminary tests have passed but please note this program does not test for valid CRN numbers. "
+                            + "Currently you will be registering for the following date/semester and time: \n"
+                            + scheduleDate.getValue().format(dateFormatter) + " " + semesterString + " " + timeToSchedule
+                            + "\nIf you would like to continue with this info press yes. If something looks wrong press no and please correct it.");
                     Optional<ButtonType> result = alert.showAndWait();
                     if (result.get() == buttonYes) {
                         Stack<String> crns = new Stack();
@@ -245,16 +260,6 @@ public class WrightStateScheduler extends Application {
                             if (!crnBoxes.get(i).getText().isEmpty()) {
                                 crns.push(crnBoxes.get(i).getText());
                             }
-                        }
-                        int semester;
-                        if (semesterButtons.getSelectedToggle() == fall) {
-                            semester = 80;
-                        } else if (semesterButtons.getSelectedToggle() == summer) {
-                            semester = 40;
-                        } else if (semesterButtons.getSelectedToggle() == spring) {
-                            semester = 30;
-                        } else {
-                            semester = 0;
                         }
                         String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 9);
                         WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
@@ -277,6 +282,20 @@ public class WrightStateScheduler extends Application {
         scheduleNow.setOnAction(e
                 -> {
             int emptyCrnBoxes = 0;
+            String semesterString = "";
+            int semester;
+            if (semesterButtons.getSelectedToggle() == fall) {
+                semester = 80;
+                semesterString = "fall";
+            } else if (semesterButtons.getSelectedToggle() == summer) {
+                semester = 40;
+                semesterString = "Summer";
+            } else if (semesterButtons.getSelectedToggle() == spring) {
+                semester = 30;
+                semesterString = "Spring";
+            } else {
+                semester = 0;
+            }
             for (int i = 0; i < crnBoxes.size(); i++) {
                 if (crnBoxes.get(i).getText().isEmpty()) {
                     emptyCrnBoxes++;
@@ -300,14 +319,15 @@ public class WrightStateScheduler extends Application {
                 noToggle.showAndWait();
             } else {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Submitting CRNs");
+                alert.setTitle("Submit?");
                 alert.setHeaderText(null);
                 ButtonType buttonYes = new ButtonType("Yes");
                 ButtonType buttonNo = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
                 alert.getButtonTypes().setAll(buttonYes, buttonNo);
-                alert.setContentText("You are about to register for classes.\n"
-                        + "Please note that this program does not check for invalid CRNs.\n"
-                        + "If you wish to proceed, press yes.");
+                alert.setContentText("All preliminary tests have passed but please note this program does not test for valid CRN numbers. "
+                        + "Currently you will be registering for the following date/semester: \n"
+                        + scheduleDate.getValue().format(dateFormatter) + " " + semesterString
+                        + "\nIf you would like to continue with this info press yes. If something looks wrong press no and please correct it.");
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.get() == buttonYes) {
                     Stack<String> crns = new Stack();
@@ -315,16 +335,6 @@ public class WrightStateScheduler extends Application {
                         if (!crnBoxes.get(i).getText().isEmpty()) {
                             crns.push(crnBoxes.get(i).getText());
                         }
-                    }
-                    int semester;
-                    if (semesterButtons.getSelectedToggle() == fall) {
-                        semester = 80;
-                    } else if (semesterButtons.getSelectedToggle() == summer) {
-                        semester = 40;
-                    } else if (semesterButtons.getSelectedToggle() == spring) {
-                        semester = 30;
-                    } else {
-                        semester = 0;
                     }
                     String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 10);
                     WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, crns, log);
