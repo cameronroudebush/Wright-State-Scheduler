@@ -5,14 +5,14 @@ Welcome to WSS! This program was built with one goal in mind: to make it so you 
 
 WSS can do all the following:
 
-- [x] Schedule at this exact moment
-- [x] Schedule at any given time in the future
-- [x] Enter up to 10 CRN's at a time
-- [x] Select any semester that is offered (Spring, Summer, Fall)
-- [x] Alert you if your UID or password is incorrect
-- [x] Make sure you only put in time values for the future
-- [x] Keep logs of any potential failures
-- [x] Alert you if the given CRN's have a registration or corequisite error
+-  Schedule at this exact moment
+-  Schedule at any given time in the future
+-  Enter up to 10 CRN's at a time
+-  Select any semester that is offered (Spring, Summer, Fall)
+-  Alert you if your UID or password is incorrect
+-  Make sure you only put in time values for the future
+-  Keep logs of any potential failures
+-  Alert you if the given CRN's have a registration or corequisite error
 
 Our goal was to make this project as user-friendly as possible and the long-term goal is to make it to a phone.
 
