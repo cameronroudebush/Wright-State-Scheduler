@@ -2,6 +2,7 @@ package WSS;
 
 
 
+import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,9 +13,11 @@ import javax.swing.SwingUtilities;
 public class Clock extends TimerTask {
 
     TextField currentDateAndTime;
+    private PrintStream log;
 
-    public Clock(TextField timeField) {
+    public Clock(TextField timeField, PrintStream log) {
         this.currentDateAndTime = timeField;
+        this.log = log;
     }
 
     public String getCurrentDateAndTime() {
@@ -33,7 +36,7 @@ public class Clock extends TimerTask {
                     try{
                     currentDateAndTime.setText("Current Time: " + dateAndTime.format(date));
                     }catch (Exception e){
-                        System.out.println("An Error has occured within the timer");
+                        log.println("An Error has occured within the timer");
                     }
                 }
 

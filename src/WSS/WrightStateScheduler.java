@@ -38,13 +38,14 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class WrightStateScheduler extends Application {
-
+    
     public static void main(String[] args) {
         Application.launch(args);
     }
 
     @Override
     public void start(Stage stage) throws Exception {
+        PrintStream log = new PrintStream(new File("log.txt"));
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         GridPane timePane = new GridPane();
         GridPane semesterPane = new GridPane();
@@ -61,7 +62,7 @@ public class WrightStateScheduler extends Application {
         TextField time = new TextField();
         time.setEditable(false);
 
-        Clock clock = new Clock(time);
+        Clock clock = new Clock(time,log);
 
         ArrayList<TextField> crnBoxes = new ArrayList();
         PasswordField password = new PasswordField();
@@ -174,7 +175,6 @@ public class WrightStateScheduler extends Application {
         });
         userName.setTextFormatter(userFormatter);
 
-        PrintStream log = new PrintStream(new File("log.txt"));
         schedule.setOnAction(e -> {
             int emptyCrnBoxes = 0;
             String selectedMeridiem;
