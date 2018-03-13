@@ -210,12 +210,12 @@ public class WrightStateScheduler extends Application {
                         emptyCrnBoxes++;
                     }
                 }
-                DateFormat formater = new SimpleDateFormat("hh:mm:ss a");
+                DateFormat formater = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a");
                 Time currentTimeFormat = null;
                 Time timeToScheduleFormat = null;
                 try {
-                    timeToScheduleFormat = new Time((formater.parse(timeToSchedule).getTime()));
-                    currentTimeFormat = new Time((formater.parse(clock.getCurrentDateAndTime().substring(25, clock.getCurrentDateAndTime().length())).getTime()));
+                    timeToScheduleFormat = new Time((formater.parse(scheduleDate.getValue().format(dateFormatter) + " " + timeToSchedule).getTime()));
+                    currentTimeFormat = new Time((formater.parse(clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length())).getTime()));
                 } catch (ParseException ex) {
                     log.println("Parse error for checking dates");
                     log.print(ex.toString());
