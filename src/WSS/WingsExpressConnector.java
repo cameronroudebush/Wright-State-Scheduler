@@ -31,6 +31,14 @@ public class WingsExpressConnector implements Runnable {
         this.crns = crns;
         this.log = log;
     }
+    
+    public WingsExpressConnector(String pin, String uid, String semester, PrintStream log) {
+        this.pin = pin;
+        this.uid = uid;
+        this.semester = semester;
+        this.log = log;
+        this.crns = null;
+    }
 
     public String getContent() {
         return content;
