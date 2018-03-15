@@ -31,7 +31,7 @@ public class WingsExpressConnector implements Runnable {
         this.crns = crns;
         this.log = log;
     }
-    
+
     public WingsExpressConnector(String pin, String uid, String semester, PrintStream log) {
         this.pin = pin;
         this.uid = uid;
@@ -135,10 +135,10 @@ public class WingsExpressConnector implements Runnable {
         }
     }
 
-    public boolean loginTest() {
+    //returns 0 for no problems, 1 for a failed login, 2 for failed a hold, 3 for a failed financial acknowledment
+    public int loginTest() {
         try {
             log.println("Running login test.");
-            boolean failureCheck = false;
             WebClient webClient = new WebClient();
             HtmlPage page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_GenMnu");
             log.println("Sucessfully connected to login page.");
@@ -161,14 +161,77 @@ public class WingsExpressConnector implements Runnable {
             WebResponse response = page.getWebResponse();
             content = response.getContentAsString();
             if (!content.contains("Student and Financial Aid")) {
-                failureCheck = true;
+                log.println("Failed loginTest");
+                return 1;
             }
-            log.println("End of login check.");
-            log.println("Status: " + failureCheck);
-            return failureCheck;
+            int failureChecks = holdTest(webClient);
+            if (failureChecks != 0) {
+                log.println("Failed hold test.");
+                return failureChecks;
+            }
+            failureChecks = awknowledgementTest(webClient);
+            if (failureChecks != 0) {
+                log.println("Failed awknowlegement test.");
+                return failureChecks;
+            }
+            log.println("Passed loginTest, holdTest, and awknowledgementTest");
+            return 0;
         } catch (FailingHttpStatusCodeException | IOException e) {
+            log.println("Exception caught: defaulting to failed login.");
             log.println(Arrays.toString(e.getStackTrace()));
-            return true;
+            return 1;
+        }
+    }
+
+    public int holdTest(WebClient webClient) {
+        try {
+            log.println("Running hold test.");
+            int failureCheck = 0;
+            log.println("Redirecting to Registration Status page.");
+            HtmlPage page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/bwskrsta.P_RegsStatusDisp");
+            log.println("Redirected successfully.");
+            log.println("Located semester drop down box.");
+            HtmlSelect semesterDropDown = page.getFirstByXPath("//*[@id=\"term_id\"]");
+            log.println(semesterDropDown);
+            log.println("Inserting semester option.");
+            log.println(semester);
+            HtmlOption semesterOption = semesterDropDown.getOptionByValue(semester);
+            semesterOption.setSelected(true);
+            log.println("Setting that semester option.");
+            log.println("Located submit semester selection button.");
+            HtmlSubmitInput submitSemester = page.getFirstByXPath("/html/body/div[4]/form/input");
+            log.println(submitSemester);
+            submitSemester.click();
+            log.println("Clicking submit semester selection button.");
+            page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/bwskrsta.P_RegsStatusDisp");
+            WebResponse response = page.getWebResponse();
+            content = response.getContentAsString();
+            if ((!content.contains("You have no Holds which prevent registration.")) || (content.contains("You have an Alternate PIN which prevents registration"))) {
+                failureCheck = 2;
+            }
+            return failureCheck;
+        } catch (IOException | FailingHttpStatusCodeException ex) {
+            log.println(Arrays.toString(ex.getStackTrace()));
+            return 2;
+        }
+    }
+
+    public int awknowledgementTest(WebClient webClient) {
+        try {
+            log.println("Running awknowledgement test.");
+            int failureCheck = 0;
+            log.println("Redirecting to Acknowledgement page.");
+            HtmlPage page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/WsuStuReqAck.P_presentques");
+            log.println("Redirected successfully.");
+            WebResponse response = page.getWebResponse();
+            content = response.getContentAsString();
+            if (!content.contains("You have accepted the terms and conditions set forth in the detailed Statement of Financial Responsibility.")) {
+                failureCheck = 3;
+            }
+            return failureCheck;
+        } catch (IOException | FailingHttpStatusCodeException ex) {
+            log.println(Arrays.toString(ex.getStackTrace()));
+            return 3;
         }
     }
 
