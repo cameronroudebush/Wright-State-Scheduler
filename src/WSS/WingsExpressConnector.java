@@ -123,6 +123,19 @@ public class WingsExpressConnector implements Runnable {
             log.println("Clicking submit CRN's button.");
             WebResponse response = page.getWebResponse();
             content = response.getContentAsString();
+            if (content.contains("Waitlisted")) {
+                log.println("Waitlisted class or classes found. Auto accepting.");
+                for (int b = 1; b < 10; b++) {
+                    System.out.println(content.contains("waitaction_id" + b));
+                    if (content.contains("waitaction_id" + b)) {
+                        HtmlSelect waitListDropDown = page.getFirstByXPath("//*[@id=\"waitaction_id" + b + "\"]");
+                        HtmlOption waitListOption = waitListDropDown.getOptionByValue("WL");
+                        waitListOption.setSelected(true);
+                    }
+                }
+                submitCrns.click();
+                log.println("Clicking submit CRN's button for auto waitlist.");
+            }
             if (content.contains("Registration Add Errors")) {
                 log.println("CRN registration add failure");
             }

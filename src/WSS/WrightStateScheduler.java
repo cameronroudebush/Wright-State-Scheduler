@@ -392,7 +392,7 @@ public class WrightStateScheduler extends Application {
                             String content = connectorReal.getContent();
                             try {
                                 if (content.contains("Registration Add Errors")) {
-                                    Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn.");
+                                    Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn or potentially a class being waitlisted.");
                                     regError.setHeaderText("Registration Add Error");
                                     regError.showAndWait();
                                 }
