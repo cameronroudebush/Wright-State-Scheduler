@@ -390,17 +390,26 @@ public class WrightStateScheduler extends Application {
                                 log.println(Arrays.toString(ex.getStackTrace()));
                             }
                             String content = connectorReal.getContent();
+                            boolean errorFound = false;
                             try {
                                 if (content.contains("Registration Add Errors")) {
+                                    errorFound = true;
                                     Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn or potentially a class being waitlisted.");
                                     regError.setHeaderText("Registration Add Error");
                                     regError.showAndWait();
                                 }
                                 if (content.contains("Corequisite")) {
+                                    errorFound = true;
                                     Alert coReqError = new Alert(Alert.AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
                                     coReqError.setHeaderText("Corequisite Error");
                                     coReqError.showAndWait();
                                 }
+                                if (!errorFound){
+                                Alert winner = new Alert(Alert.AlertType.CONFIRMATION, "The schedular seemed to have completed without any errors. We do recommend you double check with WingsExpress to be sure but it looks good on our end! \n Thanks for using WSS!");
+                                winner.setHeaderText("You Made it!");
+                                winner.setTitle("Congratulations!");
+                                winner.showAndWait();
+                            }
                             } catch (NullPointerException ex) {
                                 Alert coReqError = new Alert(Alert.AlertType.ERROR, "The date/semester combination you have selected does not work. Scheduling failed.");
                                 coReqError.setHeaderText("Semester/Date selection error");
