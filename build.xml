@@ -46,7 +46,7 @@
             <config headerType="gui" outfile="${store.dir}/WSS.exe"
                     jarPath="${store.dir}/WSS.jar" icon="${media.dir}/Icon.ico">
                 <jre minVersion="1.8.0"/>
-                <versionInfo fileVersion="0.0.0.1" txtFileVersion="0.0.0.1" 
+                <versionInfo fileVersion="0.0.0.3" txtFileVersion="0.0.0.3" 
                              fileDescription="Wright-State-Scheduler" copyright=" " 
                              productVersion="0.0.0.1" txtProductVersion="0.0.0.1"
                              productName="WSS" companyName=" " internalName="WSS" 
