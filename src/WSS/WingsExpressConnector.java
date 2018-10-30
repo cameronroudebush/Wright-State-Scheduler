@@ -32,10 +32,10 @@ public class WingsExpressConnector implements Runnable {
         this.log = log;
     }
 
-    public WingsExpressConnector(String pin, String uid, String semester, PrintStream log) {
+    public WingsExpressConnector(String pin, String uid, PrintStream log) {
         this.pin = pin;
         this.uid = uid;
-        this.semester = semester;
+        this.semester = null;
         this.log = log;
         this.crns = null;
     }
@@ -177,17 +177,17 @@ public class WingsExpressConnector implements Runnable {
                 log.println("Failed loginTest");
                 return 1;
             }
-            int failureChecks = holdTest(webClient);
-            if (failureChecks != 0) {
-                log.println("Failed hold test.");
-                return failureChecks;
-            }
-            failureChecks = awknowledgementTest(webClient);
-            if (failureChecks != 0) {
-                log.println("Failed awknowlegement test.");
-                return failureChecks;
-            }
-            log.println("Passed loginTest, holdTest, and awknowledgementTest");
+//            int failureChecks = holdTest(webClient);
+//            if (failureChecks != 0) {
+//                log.println("Failed hold test.");
+//                return failureChecks;
+//            }
+//            failureChecks = awknowledgementTest(webClient);
+//            if (failureChecks != 0) {
+//                log.println("Failed awknowlegement test.");
+//                return failureChecks;
+//            }
+            log.println("Passed loginTest");
             return 0;
         } catch (FailingHttpStatusCodeException | IOException e) {
             log.println("Exception caught: defaulting to failed login.");
