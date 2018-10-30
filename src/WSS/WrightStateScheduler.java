@@ -244,30 +244,32 @@ public class WrightStateScheduler extends Application {
                     tooLate.showAndWait();
                 } else {
                     String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 10);
+                    if (semester == 30) {
+                        int tempYear = Integer.parseInt(scheduleYear) + 1;
+                        log.println("Spring semester detected, adjusting scheduleYear to " + tempYear);
+                        scheduleYear = Integer.toString(tempYear);
+                    }
                     WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, log);
                     int loginTest = connector.loginTest();
                     switch (loginTest) {
-                        case 1:
-                            {
-                                Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
-                                regError.setHeaderText("Incorrect login");
-                                regError.showAndWait();
-                                break;
-                            }
-                        case 2:
-                            {
-                                Alert regError = new Alert(Alert.AlertType.ERROR, "You currently have a hold on your account. Please check wings express if you have an alternative PIN or a hold of some type.");
-                                regError.setHeaderText("Hold error");
-                                regError.showAndWait();
-                                break;
-                            }
-                        case 3:
-                            {
-                                Alert regError = new Alert(Alert.AlertType.ERROR, "You have forgotten to either accept/decline the wright state insurance and the acknowledgment of financial responsibility.");
-                                regError.setHeaderText("Required ackowledgment error");
-                                regError.showAndWait();
-                                break;
-                            }
+                        case 1: {
+                            Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
+                            regError.setHeaderText("Incorrect login");
+                            regError.showAndWait();
+                            break;
+                        }
+                        case 2: {
+                            Alert regError = new Alert(Alert.AlertType.ERROR, "You currently have a hold on your account. Please check wings express if you have an alternative PIN or a hold of some type.");
+                            regError.setHeaderText("Hold error");
+                            regError.showAndWait();
+                            break;
+                        }
+                        case 3: {
+                            Alert regError = new Alert(Alert.AlertType.ERROR, "You have forgotten to either accept/decline the wright state insurance and the acknowledgment of financial responsibility.");
+                            regError.setHeaderText("Required ackowledgment error");
+                            regError.showAndWait();
+                            break;
+                        }
                         default:
                             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                             alert.setTitle("Submit?");
@@ -291,7 +293,8 @@ public class WrightStateScheduler extends Application {
                                 ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter), timeToSchedule, password.getText(), userName.getText(), semester, crns, log);
                                 Thread waiterThread = new Thread(waiter);
                                 waiterThread.start();
-                            }   break;
+                            }
+                            break;
                     }
                 }
             }
@@ -338,30 +341,32 @@ public class WrightStateScheduler extends Application {
                 noToggle.showAndWait();
             } else {
                 String scheduleYear = scheduleDate.getValue().format(dateFormatter).substring(6, 10);
+                if (semester == 30) {
+                    int tempYear = Integer.parseInt(scheduleYear) + 1;
+                    log.println("Spring semester detected, adjusting scheduleYear to " + tempYear);
+                    scheduleYear = Integer.toString(tempYear);
+                }
                 WingsExpressConnector connector = new WingsExpressConnector(password.getText(), userName.getText(), scheduleYear + semester, log);
                 int loginTest = connector.loginTest();
                 switch (loginTest) {
-                    case 1:
-                        {
-                            Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
-                            regError.setHeaderText("Incorrect login");
-                            regError.showAndWait();
-                            break;
-                        }
-                    case 2:
-                        {
-                            Alert regError = new Alert(Alert.AlertType.ERROR, "You currently have a hold on your account. Please check wings express if you have an alternative PIN or a hold of some type.");
-                            regError.setHeaderText("Hold error");
-                            regError.showAndWait();
-                            break;
-                        }
-                    case 3:
-                        {
-                            Alert regError = new Alert(Alert.AlertType.ERROR, "You have forgotten to either accept/decline the wright state insurance and the acknowledgment of financial responsibility.");
-                            regError.setHeaderText("Required ackowledgment error");
-                            regError.showAndWait();
-                            break;
-                        }
+                    case 1: {
+                        Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
+                        regError.setHeaderText("Incorrect login");
+                        regError.showAndWait();
+                        break;
+                    }
+                    case 2: {
+                        Alert regError = new Alert(Alert.AlertType.ERROR, "You currently have a hold on your account. Please check wings express if you have an alternative PIN or a hold of some type.");
+                        regError.setHeaderText("Hold error");
+                        regError.showAndWait();
+                        break;
+                    }
+                    case 3: {
+                        Alert regError = new Alert(Alert.AlertType.ERROR, "You have forgotten to either accept/decline the wright state insurance and the acknowledgment of financial responsibility.");
+                        regError.setHeaderText("Required ackowledgment error");
+                        regError.showAndWait();
+                        break;
+                    }
                     default:
                         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                         alert.setTitle("Submit?");
@@ -404,18 +409,19 @@ public class WrightStateScheduler extends Application {
                                     coReqError.setHeaderText("Corequisite Error");
                                     coReqError.showAndWait();
                                 }
-                                if (!errorFound){
-                                Alert winner = new Alert(Alert.AlertType.CONFIRMATION, "The schedular seemed to have completed without any errors. We do recommend you double check with WingsExpress to be sure but it looks good on our end! \n Thanks for using WSS!");
-                                winner.setHeaderText("You Made it!");
-                                winner.setTitle("Congratulations!");
-                                winner.showAndWait();
-                            }
+                                if (!errorFound) {
+                                    Alert winner = new Alert(Alert.AlertType.CONFIRMATION, "The schedular seemed to have completed without any errors. We do recommend you double check with WingsExpress to be sure but it looks good on our end! \n Thanks for using WSS!");
+                                    winner.setHeaderText("You Made it!");
+                                    winner.setTitle("Congratulations!");
+                                    winner.showAndWait();
+                                }
                             } catch (NullPointerException ex) {
                                 Alert coReqError = new Alert(Alert.AlertType.ERROR, "The date/semester combination you have selected does not work. Scheduling failed.");
                                 coReqError.setHeaderText("Semester/Date selection error");
                                 coReqError.showAndWait();
                             }
-                        }   break;
+                        }
+                        break;
                 }
             }
         }
