@@ -14,10 +14,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Stack;
 import java.util.Timer;
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -33,7 +29,6 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleGroup;
-import javafx.util.Duration;
 
 /**
  * This class is used to control the FXML for main UI display
