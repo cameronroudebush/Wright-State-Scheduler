@@ -40,6 +40,14 @@ public class WingsExpressConnector implements Runnable {
         this.crns = null;
     }
 
+    public WingsExpressConnector(String pin, String uid, String semester, PrintStream log) {
+        this.pin = pin;
+        this.uid = uid;
+        this.semester = semester;
+        this.log = log;
+        this.crns = null;
+    }
+
     public String getContent() {
         return content;
     }
@@ -148,6 +156,44 @@ public class WingsExpressConnector implements Runnable {
         }
     }
 
+    /** Runs only the login test. Used when user is first attempting to sign in */
+    public int loginTestOnly() {
+        try {
+            log.println("Running login test.");
+            WebClient webClient = new WebClient();
+            HtmlPage page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_GenMnu");
+            log.println("Sucessfully connected to login page.");
+            log.println("UID box located.");
+            HtmlInput userBox = page.getFirstByXPath("//*[@id='UserID']");
+            log.println(userBox);
+            userBox.setValueAttribute(uid);
+            log.println("UID inserted.");
+            log.println("PIN box located.");
+            HtmlInput pinBox = (HtmlInput) page.getFirstByXPath("//*[@id=\"PIN\"]/input");
+            log.println(pinBox);
+            pinBox.setValueAttribute(pin);
+            log.println("PIN inserted.");
+            log.println("Located login button.");
+            HtmlSubmitInput submitButton = page.getFirstByXPath("/html/body/div[4]/form/p/input[1]");
+            log.println(submitButton);
+            submitButton.click();
+            log.println("Login button clicked. Redirecting to financial aid menu.");
+            page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_StuMainMnu");
+            WebResponse response = page.getWebResponse();
+            content = response.getContentAsString();
+            if (!content.contains("Student and Financial Aid")) {
+                log.println("Failed loginTest");
+                return 1;
+            }
+            log.println("Passed loginTest");
+            return 0;
+        } catch (FailingHttpStatusCodeException | IOException e) {
+            log.println("Exception caught: defaulting to failed login.");
+            log.println(Arrays.toString(e.getStackTrace()));
+            return 1;
+        }
+    }
+
     //returns 0 for no problems, 1 for a failed login, 2 for failed a hold, 3 for a failed financial acknowledment
     public int loginTest() {
         try {
@@ -177,16 +223,16 @@ public class WingsExpressConnector implements Runnable {
                 log.println("Failed loginTest");
                 return 1;
             }
-//            int failureChecks = holdTest(webClient);
-//            if (failureChecks != 0) {
-//                log.println("Failed hold test.");
-//                return failureChecks;
-//            }
-//            failureChecks = awknowledgementTest(webClient);
-//            if (failureChecks != 0) {
-//                log.println("Failed awknowlegement test.");
-//                return failureChecks;
-//            }
+            int failureChecks = holdTest(webClient);
+            if (failureChecks != 0) {
+                log.println("Failed hold test.");
+                return failureChecks;
+            }
+            failureChecks = awknowledgementTest(webClient);
+            if (failureChecks != 0) {
+                log.println("Failed awknowlegement test.");
+                return failureChecks;
+            }
             log.println("Passed loginTest");
             return 0;
         } catch (FailingHttpStatusCodeException | IOException e) {
