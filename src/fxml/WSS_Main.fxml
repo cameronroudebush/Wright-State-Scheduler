@@ -62,7 +62,7 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <TextField fx:id="clockField" alignment="CENTER_RIGHT" editable="false" prefHeight="25.0" prefWidth="230.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
+            <TextField fx:id="clockField" alignment="CENTER_RIGHT" editable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="350.0" text="Welcome: U00123456   Current Time: 10/31/2018 1:16:00 PM" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
          </children>
       </GridPane>
       <GridPane hgap="5.0" GridPane.rowIndex="2">

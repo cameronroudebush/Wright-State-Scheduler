@@ -23,7 +23,7 @@ public class Clock extends TimerTask {
     }
 
     public String getCurrentDateAndTime() {
-        return currentDateAndTime.getText();
+        return currentDateAndTime.getText().substring(21, currentDateAndTime.getText().length());
     }
 
     
