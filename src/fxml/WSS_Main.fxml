@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+
+<GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="WSS.MainController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="307.1999847412109" minWidth="10.0" prefWidth="246.8" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="417.5999755859375" minWidth="10.0" prefWidth="338.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints />
+    <RowConstraints maxHeight="281.0000213623047" minHeight="10.0" prefHeight="233.3999725341797" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="281.0000213623047" minHeight="10.0" prefHeight="90.40004882812502" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="189.79999389648438" minHeight="10.0" prefHeight="44.79995117187502" vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <Button fx:id="schedule" mnemonicParsing="false" onAction="#handleSchedule" text="Schedule Later!" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <GridPane.margin>
+            <Insets left="200.0" />
+         </GridPane.margin>
+         <tooltip>
+            <Tooltip text="This will schedule your classes at a specified time" />
+         </tooltip>
+      </Button>
+      <GridPane hgap="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="130.800048828125" minWidth="10.0" prefWidth="120.4000244140625" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="121.60002441406252" minWidth="10.0" prefWidth="102.4" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.39995117187493" minWidth="10.0" prefWidth="95.39995117187493" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints maxHeight="171.20001831054688" minHeight="10.0" prefHeight="127.20000839233398" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="171.20001831054688" minHeight="0.0" prefHeight="127.20000839233398" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="171.20001831054688" minHeight="10.0" prefHeight="48.799991607666016" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="81.4000244140625" minHeight="0.0" prefHeight="81.4000244140625" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <RadioButton fx:id="fall" mnemonicParsing="false" text="Fall" GridPane.columnIndex="2" GridPane.rowIndex="3">
+               <toggleGroup>
+                  <ToggleGroup fx:id="semesterButtons" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="spring" mnemonicParsing="false" prefHeight="18.0" prefWidth="104.0" text="Spring" toggleGroup="$semesterButtons" GridPane.rowIndex="3" />
+            <RadioButton fx:id="summer" mnemonicParsing="false" text="Summer" toggleGroup="$semesterButtons" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label alignment="CENTER" prefHeight="20.0" prefWidth="338.0" text="Select Semester:" textAlignment="CENTER" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <TextField fx:id="clockField" alignment="CENTER_RIGHT" editable="false" GridPane.columnSpan="2147483647" />
+         </children>
+      </GridPane>
+      <GridPane hgap="5.0" GridPane.rowIndex="2">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="113.199951171875" minWidth="10.0" prefWidth="99.5999755859375" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="136.4000244140625" minWidth="10.0" prefWidth="136.4000244140625" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <DatePicker fx:id="scheduleDate" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="109.0" text="Schedule Date: " textAlignment="CENTER" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </GridPane>
+      <GridPane hgap="10.0" vgap="10.0" GridPane.rowIndex="1">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <TextField fx:id="crnBox1" GridPane.rowIndex="1" />
+            <TextField fx:id="crnBox8" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="crnBox4" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="crnBox2" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="crnBox3" prefHeight="26.0" prefWidth="134.0" GridPane.rowIndex="2" />
+            <TextField fx:id="crnBox7" GridPane.rowIndex="4" />
+            <TextField fx:id="crnBox6" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="crnBox5" GridPane.rowIndex="3" />
+            <Label text="Enter CRN's Below:" GridPane.columnSpan="2">
+               <GridPane.margin>
+                  <Insets left="75.0" />
+               </GridPane.margin>
+            </Label>
+         </children>
+      </GridPane>
+      <GridPane hgap="10.0" prefHeight="177.0" prefWidth="338.0" vgap="10.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="125.40003204345703" minHeight="4.8000181913375854" prefHeight="24.39994926452637" />
+            <RowConstraints maxHeight="157.2000259399414" minHeight="10.0" prefHeight="34.19997558593751" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="94.79999389648438" minHeight="10.0" prefHeight="23.000024414062494" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <ComboBox fx:id="scheduleTimeHour" prefWidth="150.0" GridPane.rowIndex="1" />
+            <ComboBox fx:id="scheduleTimeSeconds" layoutX="10.0" layoutY="113.0" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <ComboBox fx:id="scheduleTimeMinute" layoutX="10.0" layoutY="113.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <RadioButton fx:id="pm" mnemonicParsing="false" text="PM" GridPane.columnIndex="2" GridPane.rowIndex="2">
+               <toggleGroup>
+                  <ToggleGroup fx:id="meridiem" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="am" mnemonicParsing="false" text="AM" toggleGroup="$meridiem" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label alignment="CENTER" prefHeight="20.0" prefWidth="327.0" text="Schedule Time: " textAlignment="CENTER" GridPane.columnSpan="3">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </Label>
+         </children>
+      </GridPane>
+      <ProgressIndicator fx:id="progressIndicator" maxHeight="30.0" maxWidth="30.0" visible="false" GridPane.rowIndex="3" />
+   </children>
+   <opaqueInsets>
+      <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+   </opaqueInsets>
+   <padding>
+      <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+   </padding>
+</GridPane>
