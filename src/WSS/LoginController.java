@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -57,7 +58,7 @@ public class LoginController implements Initializable {
     }
 
     @FXML
-    protected void handleLoginButtonAction(ActionEvent event) throws IOException {
+    protected void handleLoginButtonAction(ActionEvent event) throws IOException, InterruptedException {
         progressIndicator.setVisible(true);
         if (uid.getText().isEmpty() || pin.getText().isEmpty()) {
             progressIndicator.setVisible(false);
