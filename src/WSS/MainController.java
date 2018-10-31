@@ -120,9 +120,6 @@ public class MainController implements Initializable {
                 }
             }
         });
-        clock = new Clock(clockField, log);
-        Timer timer = new Timer();
-        timer.schedule(clock, 0, 1000);
         scheduleTimeHour.getItems().addAll("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12");
         for (int i = 0; i < 60; i++) {
             if (i < 10) {
@@ -142,6 +139,9 @@ public class MainController implements Initializable {
         this.PIN = PIN;
         this.UID = UID;
         this.log = log;
+        clock = new Clock(clockField, log, UID);
+        Timer timer = new Timer();
+        timer.schedule(clock, 0, 1000);
     }
 
     @FXML
@@ -261,8 +261,9 @@ public class MainController implements Initializable {
                                 }
                             }
                             String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
-                            ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter), timeToSchedule, PIN, UID, semester, crns, log);
                             progressIndicator.setVisible(true);
+                            ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter),
+                                    timeToSchedule, PIN, UID, semester, crns, log, progressIndicator);
                             Thread waiterThread = new Thread(waiter);
                             waiterThread.start();
                         }

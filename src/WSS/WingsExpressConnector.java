@@ -91,72 +91,79 @@ public class WingsExpressConnector implements Runnable {
             //Select proper semester
             log.println("Inserting semester option.");
             log.println(semester);
-            HtmlOption semesterOption = semesterDropDown.getOptionByValue(semester);
-            semesterOption.setSelected(true);
-            log.println("Setting that semester option.");
-            //Locate submit semester button
-            log.println("Located submit semester selection button.");
-            HtmlSubmitInput submitSemester = page.getFirstByXPath("/html/body/div[4]/form/input");
-            log.println(submitSemester);
-            //Click the submit semester button
-            submitSemester.click();
-            log.println("Clicking submit semester selection button.");
-            //Change pages to actual add or drop for classes
-            page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/WsuStuRegistration.P_adddropbackout");
-            log.println("Redirecting to crn plug in page.");
-            ArrayList<HtmlInput> crnBoxes = new ArrayList();
-            //Load all 10 crn boxes into an arrayList for later use
-            for (int i = 1; i < 10; i++) {
-                crnBoxes.add((HtmlInput) page.getFirstByXPath("//*[@id=\"crn_id" + i + "\"]"));
-            }
-            log.println("Found crnBoxes.");
-            log.println(crnBoxes);
-            //Add any CRNs we have into the given boxes
-            log.println("Inserting CRN's given.");
-            log.println(crns);
-            if (crns.isEmpty()) {
-                log.println("Empty CRN stack.");
-            }
-            int i = 0;
-            while (!crns.isEmpty()) {
-                crnBoxes.get(i).setValueAttribute(crns.pop());
-                i++;
-            }
-            //Locate the submit button for CRNs
-            log.println("Located submit CRN's button.");
-            HtmlSubmitInput submitCrns = page.getFirstByXPath("/html/body/div[4]/form/input[19]");
-            log.println(submitCrns);
-            //Click the submit CRNs buttons
-            page = submitCrns.click();
-            log.println("Clicking submit CRN's button.");
-            WebResponse response = page.getWebResponse();
-            content = response.getContentAsString();
-            if (content.contains("Waitlisted")) {
-                log.println("Waitlisted class or classes found. Auto accepting.");
-                for (int b = 1; b < 10; b++) {
-                    if (content.contains("waitaction_id" + b)) {
-                        HtmlSelect waitListDropDown = page.getFirstByXPath("//*[@id=\"waitaction_id" + b + "\"]");
-                        HtmlOption waitListOption = waitListDropDown.getOptionByValue("WL");
-                        waitListOption.setSelected(true);
-                    }
+            try {
+                HtmlOption semesterOption = semesterDropDown.getOptionByValue(semester);
+                semesterOption.setSelected(true);
+                log.println("Setting that semester option.");
+                //Locate submit semester button
+                log.println("Located submit semester selection button.");
+                HtmlSubmitInput submitSemester = page.getFirstByXPath("/html/body/div[4]/form/input");
+                log.println(submitSemester);
+                //Click the submit semester button
+                submitSemester.click();
+                log.println("Clicking submit semester selection button.");
+                //Change pages to actual add or drop for classes
+                page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/WsuStuRegistration.P_adddropbackout");
+                log.println("Redirecting to crn plug in page.");
+                ArrayList<HtmlInput> crnBoxes = new ArrayList();
+                //Load all 10 crn boxes into an arrayList for later use
+                for (int i = 1; i < 10; i++) {
+                    crnBoxes.add((HtmlInput) page.getFirstByXPath("//*[@id=\"crn_id" + i + "\"]"));
                 }
-                submitCrns = page.getFirstByXPath("/html/body/div[4]/form/input[19]");
-                submitCrns.click();
-                log.println("Clicking submit CRN's button for auto waitlist.");
+                log.println("Found crnBoxes.");
+                log.println(crnBoxes);
+                //Add any CRNs we have into the given boxes
+                log.println("Inserting CRN's given.");
+                log.println(crns);
+                if (crns.isEmpty()) {
+                    log.println("Empty CRN stack.");
+                }
+                int i = 0;
+                while (!crns.isEmpty()) {
+                    crnBoxes.get(i).setValueAttribute(crns.pop());
+                    i++;
+                }
+                //Locate the submit button for CRNs
+                log.println("Located submit CRN's button.");
+                HtmlSubmitInput submitCrns = page.getFirstByXPath("/html/body/div[4]/form/input[19]");
+                log.println(submitCrns);
+                //Click the submit CRNs buttons
+                page = submitCrns.click();
+                log.println("Clicking submit CRN's button.");
+                WebResponse response = page.getWebResponse();
+                content = response.getContentAsString();
+                if (content.contains("Waitlisted")) {
+                    log.println("Waitlisted class or classes found. Auto accepting.");
+                    for (int b = 1; b < 10; b++) {
+                        if (content.contains("waitaction_id" + b)) {
+                            HtmlSelect waitListDropDown = page.getFirstByXPath("//*[@id=\"waitaction_id" + b + "\"]");
+                            HtmlOption waitListOption = waitListDropDown.getOptionByValue("WL");
+                            waitListOption.setSelected(true);
+                        }
+                    }
+                    submitCrns = page.getFirstByXPath("/html/body/div[4]/form/input[19]");
+                    submitCrns.click();
+                    log.println("Clicking submit CRN's button for auto waitlist.");
+                }
+                if (content.contains("Registration Add Errors")) {
+                    log.println("CRN registration add failure");
+                }
+                if (content.contains("Corequisite")) {
+                    log.println("Corequisite error");
+                }
+                log.println("End of plugin CRN's.");
+            }catch (NullPointerException ex){
+                log.println("Potential error in selecting the semester");
+                log.println(Arrays.toString(ex.getStackTrace()));
             }
-            if (content.contains("Registration Add Errors")) {
-                log.println("CRN registration add failure");
-            }
-            if (content.contains("Corequisite")) {
-                log.println("Corequisite error");
-            }
-            log.println("End of plugin CRN's.");
         } catch (ElementNotFoundException | FailingHttpStatusCodeException | IOException e) {
             log.println(Arrays.toString(e.getStackTrace()));
         }
     }
 
-    /** Runs only the login test. Used when user is first attempting to sign in */
+    /**
+     * Runs only the login test. Used when user is first attempting to sign in
+     */
     public int loginTestOnly() {
         try {
             log.println("Running login test.");

@@ -4,9 +4,10 @@ import java.io.PrintStream;
 import java.util.Stack;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ProgressIndicator;
 
 public class ScheduleWaiter implements Runnable {
-
+    
     private Clock currentTime;
     private final String scheduleDate;
     private final String scheduleTime;
@@ -17,8 +18,10 @@ public class ScheduleWaiter implements Runnable {
     private String content;
     private PrintStream log;
     private boolean errorFound = false;
-
-    public ScheduleWaiter(Clock currentTime, String scheduleDate, String scheduleTime, String pin, String uid, int semester, Stack<String> crns, PrintStream log) {
+    private ProgressIndicator progressIndicator;
+    
+    public ScheduleWaiter(Clock currentTime, String scheduleDate, String scheduleTime, String pin, String uid, int semester, Stack<String> crns,
+             PrintStream log, ProgressIndicator indicator) {
         this.currentTime = currentTime;
         this.scheduleDate = scheduleDate;
         this.scheduleTime = scheduleTime;
@@ -27,12 +30,13 @@ public class ScheduleWaiter implements Runnable {
         this.semester = semester;
         this.crns = crns;
         this.log = log;
+        this.progressIndicator = indicator;
     }
-
+    
     public String getContent() {
         return content;
     }
-
+    
     private void comparisonWaiter() {
         while (!currentTime.getCurrentDateAndTime().substring(14, 24).equals(scheduleDate)) {
             try {
@@ -64,6 +68,7 @@ public class ScheduleWaiter implements Runnable {
                     @Override
                     public void run() {
                         try {
+                            progressIndicator.setVisible(false);
                             if (content.contains("Registration Add Errors")) {
                                 errorFound = true;
                                 Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn or potentially a class being waitlisted.");
@@ -76,7 +81,7 @@ public class ScheduleWaiter implements Runnable {
                                 coReqError.setHeaderText("Corequisite Error");
                                 coReqError.showAndWait();
                             }
-                            if (!errorFound){
+                            if (!errorFound) {
                                 Alert winner = new Alert(Alert.AlertType.CONFIRMATION, "The schedular seemed to have completed without any errors. We do recommend you double check with WingsExpress to be sure but it looks good on our end! \n Thanks for using WSS!");
                                 winner.setHeaderText("You Made it!");
                                 winner.setTitle("Congratulations!");
@@ -88,17 +93,16 @@ public class ScheduleWaiter implements Runnable {
                             coReqError.showAndWait();;
                         }
                     }
-                });
-
+                }); 
             }
         } catch (InterruptedException ex) {
         }
-
+        
     }
-
+    
     @Override
     public void run() {
         comparisonWaiter();
     }
-
+    
 }

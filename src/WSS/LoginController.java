@@ -6,6 +6,12 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -57,37 +63,71 @@ public class LoginController implements Initializable {
     }
 
     @FXML
-    protected void handleLoginButtonAction(ActionEvent event) throws IOException {
+    protected void handleLoginButtonAction(ActionEvent event) throws IOException, InterruptedException {
         progressIndicator.setVisible(true);
-        if (uid.getText().isEmpty() || pin.getText().isEmpty()) {
-            progressIndicator.setVisible(false);
-            log.println("Empty login");
-            Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
-            regError.setHeaderText("Empty login");
-            regError.showAndWait();
-        } else {
-            WingsExpressConnector connector = new WingsExpressConnector(pin.getText(), uid.getText(), log);
-            int loginTest = connector.loginTestOnly();
-            if (loginTest == 1) {
-                progressIndicator.setVisible(false);
-                log.println("Incorrect login");
-                Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
-                regError.setHeaderText("Incorrect login");
-                regError.showAndWait();
-            } else {
-                progressIndicator.setVisible(false);
-                log.println("Sucessful login");
-                UID = uid.getText();
-                PIN = pin.getText();
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/WSS_Main.fxml"));
-                Parent newPane = fxmlLoader.load();
-                MainController controller = fxmlLoader.<MainController>getController();
-                controller.setInfo(UID, PIN, log);
-                Scene scene = new Scene(newPane, 640, 450);
-                Stage appStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                appStage.setScene(scene);
-                appStage.show();
+        Service<Boolean> ser = new Service<Boolean>() {
+            @Override
+            protected Task createTask() {
+                return new Task<Boolean>() {
+                    @Override
+                    protected Boolean call() throws InterruptedException {
+                        if (uid.getText().isEmpty() || pin.getText().isEmpty()) {
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    progressIndicator.setVisible(false);
+                                    log.println("Empty login");
+                                    Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
+                                    regError.setHeaderText("Empty login");
+                                    regError.showAndWait();
+                                }
+                            });
+                            return true;
+                        } else {
+                            WingsExpressConnector connector = new WingsExpressConnector(pin.getText(), uid.getText(), log);
+                            int loginTest = connector.loginTestOnly();
+                            if (loginTest == 1) {
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        progressIndicator.setVisible(false);
+                                        log.println("Incorrect login");
+                                        Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
+                                        regError.setHeaderText("Incorrect login");
+                                        regError.showAndWait();
+                                    }
+                                });
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                };
             }
-        }
+        };
+        ser.setOnSucceeded(
+                (WorkerStateEvent currentEvent) -> {
+                    Boolean processValue = ser.getValue();
+                    if (processValue == false) {
+                        try {
+                            progressIndicator.setVisible(false);
+                            log.println("Sucessful login");
+                            UID = uid.getText();
+                            PIN = pin.getText();
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/WSS_Main.fxml"));
+                            Parent newPane = fxmlLoader.load();
+                            MainController controller = fxmlLoader.<MainController>getController();
+                            controller.setInfo(UID, PIN, log);
+                            Scene scene = new Scene(newPane, 640, 450);
+                            Stage appStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                            appStage.setScene(scene);
+                            appStage.show();
+                        } catch (IOException ex) {
+                            log.println("IO error for fxml" + ex);
+                        }
+                    }
+                });
+        ser.start();
+
     }
 }

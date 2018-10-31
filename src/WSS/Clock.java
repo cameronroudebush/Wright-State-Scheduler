@@ -14,14 +14,16 @@ public class Clock extends TimerTask {
 
     TextField currentDateAndTime;
     private PrintStream log;
+    private String uid;
 
-    public Clock(TextField timeField, PrintStream log) {
+    public Clock(TextField timeField, PrintStream log, String uid) {
         this.currentDateAndTime = timeField;
         this.log = log;
+        this.uid = uid;
     }
 
     public String getCurrentDateAndTime() {
-        return currentDateAndTime.getText();
+        return currentDateAndTime.getText().substring(21, currentDateAndTime.getText().length());
     }
 
     
@@ -34,12 +36,11 @@ public class Clock extends TimerTask {
                     DateFormat dateAndTime = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
                     Date date = new Date();
                     try{
-                    currentDateAndTime.setText("Current Time: " + dateAndTime.format(date));
+                    currentDateAndTime.setText("Welcome: " + uid.toUpperCase() +"   Current Time: " + dateAndTime.format(date));
                     }catch (Exception e){
                         log.println("An Error has occured within the timer");
                     }
                 }
-
             });
         }
     }
