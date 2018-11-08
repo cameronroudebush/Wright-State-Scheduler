@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -72,30 +70,24 @@ public class LoginController implements Initializable {
                     @Override
                     protected Boolean call() throws InterruptedException {
                         if (uid.getText().isEmpty() || pin.getText().isEmpty()) {
-                            Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    progressIndicator.setVisible(false);
-                                    log.println("Empty login");
-                                    Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
-                                    regError.setHeaderText("Empty login");
-                                    regError.showAndWait();
-                                }
+                            Platform.runLater(() -> {
+                                progressIndicator.setVisible(false);
+                                log.println("Empty login");
+                                Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
+                                regError.setHeaderText("Empty login");
+                                regError.showAndWait();
                             });
                             return true;
                         } else {
                             WingsExpressConnector connector = new WingsExpressConnector(pin.getText(), uid.getText(), log);
                             int loginTest = connector.loginTestOnly();
                             if (loginTest == 1) {
-                                Platform.runLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        progressIndicator.setVisible(false);
-                                        log.println("Incorrect login");
-                                        Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
-                                        regError.setHeaderText("Incorrect login");
-                                        regError.showAndWait();
-                                    }
+                                Platform.runLater(() -> {
+                                    progressIndicator.setVisible(false);
+                                    log.println("Incorrect login");
+                                    Alert regError = new Alert(Alert.AlertType.ERROR, "You seem to have miss typed your login info.");
+                                    regError.setHeaderText("Incorrect login");
+                                    regError.showAndWait();
                                 });
                                 return true;
                             }
@@ -126,8 +118,8 @@ public class LoginController implements Initializable {
                             log.println("IO error for fxml" + ex);
                         }
                     }
-                });
+                }
+        );
         ser.start();
-
     }
 }

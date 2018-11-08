@@ -36,16 +36,16 @@ public class WingsExpressConnector implements Runnable {
         this.pin = pin;
         this.uid = uid;
         this.semester = null;
-        this.log = log;
         this.crns = null;
+        this.log = log;
     }
 
     public WingsExpressConnector(String pin, String uid, String semester, PrintStream log) {
         this.pin = pin;
         this.uid = uid;
         this.semester = semester;
-        this.log = log;
         this.crns = null;
+        this.log = log;
     }
 
     public String getContent() {
@@ -54,16 +54,15 @@ public class WingsExpressConnector implements Runnable {
 
     public void pluginCrns() {
         try {
-            log.println("Running CRN plugin.");
+            log.println("Running CRN plugin");
             //Generate the web client
             WebClient webClient = new WebClient();
             //Load the login page
             HtmlPage page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_GenMnu");
-            log.println("Sucessfully connected to login page.");
+            log.println("Sucessfully connected to login page");
             //Locate the UserID box from xml
-            log.println("UID box located.");
             HtmlInput userBox = page.getFirstByXPath("//*[@id='UserID']");
-            log.println(userBox);
+            log.println("UID box located" + userBox);
             //Plugin UID
             userBox.setValueAttribute(uid);
             log.println("UID inserted.");
@@ -160,13 +159,12 @@ public class WingsExpressConnector implements Runnable {
             log.println(Arrays.toString(e.getStackTrace()));
         }
     }
-
-    /**
+     /**
      * Runs only the login test. Used when user is first attempting to sign in
      */
     public int loginTestOnly() {
         try {
-            log.println("Running login test.");
+            log.println("Running login only test.");
             WebClient webClient = new WebClient();
             HtmlPage page = webClient.getPage("https://wingsexpress.wright.edu/pls/PROD/twbkwbis.P_GenMenu?name=bmenu.P_GenMnu");
             log.println("Sucessfully connected to login page.");
@@ -192,7 +190,7 @@ public class WingsExpressConnector implements Runnable {
                 log.println("Failed loginTest");
                 return 1;
             }
-            log.println("Passed loginTest");
+            log.println("Passed logi only test.");
             return 0;
         } catch (FailingHttpStatusCodeException | IOException e) {
             log.println("Exception caught: defaulting to failed login.");

@@ -51,13 +51,12 @@
             <RowConstraints maxHeight="81.4000244140625" minHeight="0.0" prefHeight="81.4000244140625" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <RadioButton fx:id="fall" mnemonicParsing="false" text="Fall" GridPane.columnIndex="2" GridPane.rowIndex="5">
+            <RadioButton fx:id="spring" mnemonicParsing="false" prefHeight="18.0" prefWidth="104.0" text="Spring" GridPane.rowIndex="5">
                <toggleGroup>
                   <ToggleGroup fx:id="semesterButtons" />
-               </toggleGroup>
-            </RadioButton>
-            <RadioButton fx:id="spring" mnemonicParsing="false" prefHeight="18.0" prefWidth="104.0" text="Spring" toggleGroup="$semesterButtons" GridPane.rowIndex="5" />
+               </toggleGroup></RadioButton>
             <RadioButton fx:id="summer" mnemonicParsing="false" text="Summer" toggleGroup="$semesterButtons" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <RadioButton fx:id="fall" mnemonicParsing="false" text="Fall" toggleGroup="$semesterButtons" GridPane.columnIndex="2" GridPane.rowIndex="5" />
             <Label alignment="CENTER" prefHeight="20.0" prefWidth="301.0" text="Select Semester:" textAlignment="CENTER" GridPane.columnSpan="2147483647" GridPane.rowIndex="4">
                <font>
                   <Font size="14.0" />
@@ -98,18 +97,18 @@
         </rowConstraints>
          <children>
             <TextField fx:id="crnBox1" GridPane.rowIndex="1" />
-            <TextField fx:id="crnBox8" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <TextField fx:id="crnBox4" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <TextField fx:id="crnBox2" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="crnBox3" prefHeight="26.0" prefWidth="134.0" GridPane.rowIndex="2" />
-            <TextField fx:id="crnBox7" GridPane.rowIndex="4" />
-            <TextField fx:id="crnBox6" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <TextField fx:id="crnBox5" GridPane.rowIndex="3" />
+            <TextField fx:id="crnBox3" GridPane.rowIndex="2" />
             <Label text="Enter CRN's Below:" GridPane.columnSpan="2">
                <GridPane.margin>
                   <Insets left="75.0" />
                </GridPane.margin>
             </Label>
+            <TextField fx:id="crnBox4" prefHeight="26.0" prefWidth="134.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="crnBox5" GridPane.rowIndex="3" />
+            <TextField fx:id="crnBox6" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="crnBox7" GridPane.rowIndex="4" />
+            <TextField fx:id="crnBox8" GridPane.columnIndex="1" GridPane.rowIndex="4" />
          </children>
       </GridPane>
       <GridPane hgap="10.0" prefHeight="177.0" prefWidth="338.0" vgap="10.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
@@ -124,16 +123,14 @@
             <RowConstraints maxHeight="94.79999389648438" minHeight="10.0" prefHeight="23.000024414062494" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <ComboBox fx:id="scheduleTimeHour" prefWidth="150.0" GridPane.rowIndex="1" />
-            <ComboBox fx:id="scheduleTimeSeconds" layoutX="10.0" layoutY="113.0" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-            <ComboBox fx:id="scheduleTimeMinute" layoutX="10.0" layoutY="113.0" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <RadioButton fx:id="pm" mnemonicParsing="false" text="PM" GridPane.columnIndex="2" GridPane.rowIndex="2">
+            <ComboBox fx:id="scheduleTimeHour" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ComboBox fx:id="scheduleTimeMinute" layoutX="10.0" layoutY="113.0" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <RadioButton fx:id="am" mnemonicParsing="false" prefHeight="17.0" prefWidth="54.0" text="AM" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <toggleGroup>
                   <ToggleGroup fx:id="meridiem" />
-               </toggleGroup>
-            </RadioButton>
-            <RadioButton fx:id="am" mnemonicParsing="false" text="AM" toggleGroup="$meridiem" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Label alignment="CENTER" prefHeight="20.0" prefWidth="327.0" text="Schedule Time: " textAlignment="CENTER" GridPane.columnSpan="3">
+               </toggleGroup></RadioButton>
+            <RadioButton fx:id="pm" mnemonicParsing="false" text="PM" toggleGroup="$meridiem" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Label alignment="CENTER" prefHeight="20.0" prefWidth="110.0" text="Schedule Time: " textAlignment="CENTER" GridPane.columnSpan="3" GridPane.rowIndex="1">
                <font>
                   <Font size="14.0" />
                </font>

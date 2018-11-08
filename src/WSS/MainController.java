@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Stack;
 import java.util.Timer;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -53,8 +54,6 @@ public class MainController implements Initializable {
     private ComboBox scheduleTimeHour;
     @FXML
     private ComboBox scheduleTimeMinute;
-    @FXML
-    private ComboBox scheduleTimeSeconds;
     @FXML
     private TextField clockField;
     @FXML
@@ -124,10 +123,8 @@ public class MainController implements Initializable {
         for (int i = 0; i < 60; i++) {
             if (i < 10) {
                 scheduleTimeMinute.getItems().add("0" + i);
-                scheduleTimeSeconds.getItems().add("0" + i);
             } else {
                 scheduleTimeMinute.getItems().add(i);
-                scheduleTimeSeconds.getItems().add(i);
             }
         }
     }
@@ -139,7 +136,7 @@ public class MainController implements Initializable {
         this.PIN = PIN;
         this.UID = UID;
         this.log = log;
-        clock = new Clock(clockField, log, UID);
+        clock = new Clock(clockField, UID, log);
         Timer timer = new Timer();
         timer.schedule(clock, 0, 1000);
     }
@@ -169,13 +166,13 @@ public class MainController implements Initializable {
             selectedMeridiem = "PM";
         }
         if (scheduleTimeHour.getSelectionModel().getSelectedItem() == null || scheduleTimeMinute.getSelectionModel().getSelectedItem() == null
-                || scheduleTimeSeconds.getSelectionModel().getSelectedItem() == null || meridiem.getSelectedToggle() == null) {
+                || meridiem.getSelectedToggle() == null) {
             Alert tooLate = new Alert(AlertType.ERROR, "Please make sure to fill in all of the time drop down boxes and select a meridiem!");
             tooLate.setHeaderText("Time error");
             tooLate.showAndWait();
         } else {
             String timeToSchedule = scheduleTimeHour.getSelectionModel().getSelectedItem().toString() + ":" + scheduleTimeMinute.getSelectionModel().getSelectedItem().toString() + ":"
-                    + scheduleTimeSeconds.getSelectionModel().getSelectedItem().toString() + " " + selectedMeridiem;
+                    + "00" + " " + selectedMeridiem;
             for (int i = 0; i < crnBoxes.size(); i++) {
                 if (crnBoxes.get(i).getText().isEmpty()) {
                     emptyCrnBoxes++;
@@ -192,7 +189,6 @@ public class MainController implements Initializable {
                 log.print(ex.toString());
                 log.println();
             }
-
             if (UID.isEmpty() || PIN.isEmpty()) {
                 Alert regError = new Alert(AlertType.ERROR, "Either your password or uid box is empty.");
                 regError.setHeaderText("Empty login");
@@ -261,11 +257,10 @@ public class MainController implements Initializable {
                                 }
                             }
                             String dateTime = clock.getCurrentDateAndTime().substring(14, clock.getCurrentDateAndTime().length());
-                            progressIndicator.setVisible(true);
+//                            Platform.runLater(() -> progressIndicator.setVisible(true));
                             ScheduleWaiter waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter),
                                     timeToSchedule, PIN, UID, semester, crns, log, progressIndicator);
                             Thread waiterThread = new Thread(waiter);
-                            waiterThread.start();
                         }
                         break;
                 }
