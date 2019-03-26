@@ -7,13 +7,13 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="Wright_State_Scheduler" default="default" basedir=".">
+<project name="Wright_State_Scheduler" default="build" basedir=".">
     <description>Builds, tests, and runs the project Wright State Scheduler.</description>
     <import file="nbproject/build-impl.xml"/>
     <property name="store.dir" value="store"/>
     <property name="media.dir" value="src/Media"/>
     
-    <target name="default" depends="jar">
+    <target name="build" depends="jar">
         <property name="store.jar.test" value="WSS"/>
         
         <property name="store.jar" value="${store.dir}/WSS.jar"/>
