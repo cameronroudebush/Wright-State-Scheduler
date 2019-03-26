@@ -24,6 +24,7 @@ public class ScheduleWaiter implements Runnable {
     private PrintStream log;
     private boolean errorFound = false;
     private ProgressIndicator progressIndicator;
+    private MainController controller;
 
     /**
      * Constructor for setting information
@@ -37,9 +38,10 @@ public class ScheduleWaiter implements Runnable {
      * @param crns All of the crns the user has inserted
      * @param log The log print stream for logging
      * @param indicator The progress indicator incase we need to use it
+     * @param controller The main controller
      */
     public ScheduleWaiter(Clock currentTime, String scheduleDate, String scheduleTime, String pin, String uid, int semester, Stack<String> crns,
-            PrintStream log, ProgressIndicator indicator) {
+            PrintStream log, ProgressIndicator indicator, MainController controller) {
         this.currentTime = currentTime;
         this.scheduleDate = scheduleDate;
         this.scheduleTime = scheduleTime;
@@ -49,6 +51,7 @@ public class ScheduleWaiter implements Runnable {
         this.crns = crns;
         this.log = log;
         this.progressIndicator = indicator;
+        this.controller = controller;
     }
 
     /**
@@ -98,27 +101,29 @@ public class ScheduleWaiter implements Runnable {
                             Alert regError = new Alert(Alert.AlertType.ERROR, "There was an error adding the crn's. Please check with WingsExpress to see what didn't get added. This is normally due to a miss-typed crn or potentially a class being waitlisted.");
                             regError.setHeaderText("Registration Add Error");
                             regError.showAndWait();
-                            log.print("Registration Add Error");
+                            log.println("Registration Add Error");
                         }
                         if (content.contains("Corequisite")) {
                             errorFound = true;
                             Alert coReqError = new Alert(Alert.AlertType.ERROR, "There was some sort of error adding the crn's. You seemed to have forgotten a corequisite. Please check with WingsExpress to resolve this.");
                             coReqError.setHeaderText("Corequisite Error");
                             coReqError.showAndWait();
-                            log.print("Corequisite Error");
+                            log.println("Corequisite Error");
                         }
                         if (!errorFound) {
                             Alert winner = new Alert(Alert.AlertType.CONFIRMATION, "The schedular seemed to have completed without any errors. We do recommend you double check with WingsExpress to be sure but it looks good on our end! \n Thanks for using WSS!");
                             winner.setHeaderText("You Made it!");
                             winner.setTitle("Congratulations!");
                             winner.showAndWait();
-                            log.print("Everything finished successfully");
+                            log.println("Everything finished successfully");
                         }
+                        controller.waiter = null;
                     } catch (NullPointerException e) {
                         Alert coReqError = new Alert(Alert.AlertType.ERROR, "The date/semester combination you have selected does not work. Scheduling failed.");
                         coReqError.setHeaderText("Semester/Date selection error");
                         coReqError.showAndWait();
                         log.print("Semester/Date selection error");
+                        controller.waiter = null;
                     }
                 });
             }

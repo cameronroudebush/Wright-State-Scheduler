@@ -305,7 +305,7 @@ public class MainController implements Initializable {
                                 new Thread(task).start();
                                 // Create the waiter so the schedular starts to run
                                 waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter),
-                                        timeToSchedule, PIN, UID, semester, crns, log, progressIndicator);
+                                        timeToSchedule, PIN, UID, semester, crns, log, progressIndicator, this);
                                 Thread waiterThread = new Thread(waiter);
                                 waiterThread.start();
                             }
