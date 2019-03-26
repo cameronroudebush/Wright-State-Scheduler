@@ -7,6 +7,11 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+/**
+ * This is the main area for WSS and what begins the login page, and main program.
+ *  From here you can't do much but load up the beginning content.
+ * @author croudebush
+ */
 public class WrightStateScheduler extends Application {
 
     public static void main(String[] args) {

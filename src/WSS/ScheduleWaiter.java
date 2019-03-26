@@ -6,6 +6,11 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ProgressIndicator;
 
+/**
+ * This class is used as the meat for waiting to schedule classes
+ *
+ * @author Cameron Roudebush
+ */
 public class ScheduleWaiter implements Runnable {
 
     private Clock currentTime;
@@ -20,6 +25,19 @@ public class ScheduleWaiter implements Runnable {
     private boolean errorFound = false;
     private ProgressIndicator progressIndicator;
 
+    /**
+     * Constructor for setting information
+     *
+     * @param currentTime Our current time
+     * @param scheduleDate The date we wish to schedule
+     * @param scheduleTime The time we wish to schedule
+     * @param pin The password of the user
+     * @param uid The uid of the user
+     * @param semester The semester selected by the user
+     * @param crns All of the crns the user has inserted
+     * @param log The log print stream for logging
+     * @param indicator The progress indicator incase we need to use it
+     */
     public ScheduleWaiter(Clock currentTime, String scheduleDate, String scheduleTime, String pin, String uid, int semester, Stack<String> crns,
             PrintStream log, ProgressIndicator indicator) {
         this.currentTime = currentTime;
@@ -33,19 +51,29 @@ public class ScheduleWaiter implements Runnable {
         this.progressIndicator = indicator;
     }
 
+    /**
+     * This is used to get the content of the wings express page
+     *
+     * @return The content of the connection to wings express
+     */
     public String getContent() {
         return content;
     }
 
+    /**
+     * This function is used to wait on the current thread for the schedule time
+     */
     private void comparisonWaiter() {
         while (!currentTime.getCurrentDateAndTime().substring(14, 24).equals(scheduleDate)) {
+            // Attempt to wait since we are at the wrong date
             try {
-                log.print("Hit wait command on date: " + currentTime.getCurrentDateAndTime() + " " + scheduleDate);
+                log.println("Hit wait command on date: " + currentTime.getCurrentDateAndTime() + " " + scheduleDate);
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
             }
         }
         while (!currentTime.getCurrentDateAndTime().substring(25, currentTime.getCurrentDateAndTime().length()).equals(scheduleTime)) {
+            // Attempt to wait since we are at the wrong time
             try {
                 log.println("Hit wait command on time: " + currentTime.getCurrentDateAndTime() + " " + scheduleTime);
                 Thread.sleep(1000);
@@ -53,6 +81,7 @@ public class ScheduleWaiter implements Runnable {
             }
         }
         try {
+            // We are done waiting so move on
             String scheduleYear = scheduleDate.substring(scheduleDate.length() - 4, scheduleDate.length());
             WingsExpressConnector connector = new WingsExpressConnector(pin, uid, scheduleYear + semester, crns, log);
             {
@@ -60,6 +89,7 @@ public class ScheduleWaiter implements Runnable {
                 t.start();
                 t.join();
                 content = connector.getContent();
+                // Alert the user of the results
                 Platform.runLater(() -> {
                     try {
                         progressIndicator.setVisible(false);

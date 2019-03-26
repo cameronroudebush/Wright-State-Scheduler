@@ -15,6 +15,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
 
+/**
+ * This class is used as the connector to the wings express page This class is
+ * vital for testing if the user has dealt with account restrictions and for
+ * doing the actual registration
+ *
+ * @author Cameron Roudebush
+ */
 public class WingsExpressConnector implements Runnable {
 
     private final String pin;
@@ -24,6 +31,15 @@ public class WingsExpressConnector implements Runnable {
     private String content;
     private PrintStream log;
 
+    /**
+     * Wings express connector used for running the real deal of scheduling
+     *
+     * @param pin The users password
+     * @param uid The users user name
+     * @param semester The semester the user selected
+     * @param crns The crns the user put in
+     * @param log The log print stream for errors
+     */
     public WingsExpressConnector(String pin, String uid, String semester, Stack<String> crns, PrintStream log) {
         this.pin = pin;
         this.uid = uid;
@@ -32,6 +48,13 @@ public class WingsExpressConnector implements Runnable {
         this.log = log;
     }
 
+    /**
+     * Wings express connector used for running login tests
+     *
+     * @param pin The users password
+     * @param uid The users user name
+     * @param log The log print stream for errors
+     */
     public WingsExpressConnector(String pin, String uid, PrintStream log) {
         this.pin = pin;
         this.uid = uid;
@@ -40,6 +63,14 @@ public class WingsExpressConnector implements Runnable {
         this.log = log;
     }
 
+    /**
+     * Wings express connector used for running semester checks
+     *
+     * @param pin The users password
+     * @param uid The users user name
+     * @param semester The semester the user selected
+     * @param log The print stream of the log
+     */
     public WingsExpressConnector(String pin, String uid, String semester, PrintStream log) {
         this.pin = pin;
         this.uid = uid;
@@ -48,10 +79,19 @@ public class WingsExpressConnector implements Runnable {
         this.log = log;
     }
 
+    /**
+     * Returns the content from the web page
+     *
+     * @return The content of the web page
+     */
     public String getContent() {
         return content;
     }
 
+    /**
+     * Puts in the crns for the user. This is the main function that actually
+     * inserts data and registers the user on wings express.
+     */
     public void pluginCrns() {
         try {
             log.println("Running CRN plugin");
@@ -151,7 +191,7 @@ public class WingsExpressConnector implements Runnable {
                     log.println("Corequisite error");
                 }
                 log.println("End of plugin CRN's.");
-            }catch (NullPointerException ex){
+            } catch (NullPointerException ex) {
                 log.println("Potential error in selecting the semester");
                 log.println(Arrays.toString(ex.getStackTrace()));
             }
@@ -159,8 +199,12 @@ public class WingsExpressConnector implements Runnable {
             log.println(Arrays.toString(e.getStackTrace()));
         }
     }
-     /**
-     * Runs only the login test. Used when user is first attempting to sign in
+
+    /**
+     * Runs only the login test. Used when user is first attempting to sign in.
+     * Returns 0 for no problems, 1 for a failed login.
+     *
+     * @return The int of the results of the test
      */
     public int loginTestOnly() {
         try {
@@ -190,7 +234,7 @@ public class WingsExpressConnector implements Runnable {
                 log.println("Failed loginTest");
                 return 1;
             }
-            log.println("Passed logi only test.");
+            log.println("Passed login only test.");
             return 0;
         } catch (FailingHttpStatusCodeException | IOException e) {
             log.println("Exception caught: defaulting to failed login.");
@@ -199,7 +243,14 @@ public class WingsExpressConnector implements Runnable {
         }
     }
 
-    //returns 0 for no problems, 1 for a failed login, 2 for failed a hold, 3 for a failed financial acknowledment
+    //
+    /**
+     * Runs only the login test. Used when user is first attempting to sign in.
+     * Returns 0 for no problems, 1 for a failed login, 2 for failed a hold, 
+     *  3 for a failed financial acknowledgment
+     *
+     * @return The int of the results of the test
+     */
     public int loginTest() {
         try {
             log.println("Running login test.");
@@ -233,7 +284,7 @@ public class WingsExpressConnector implements Runnable {
                 log.println("Failed hold test.");
                 return failureChecks;
             }
-            failureChecks = awknowledgementTest(webClient);
+            failureChecks = acknowledgmentTest(webClient);
             if (failureChecks != 0) {
                 log.println("Failed awknowlegement test.");
                 return failureChecks;
@@ -247,6 +298,14 @@ public class WingsExpressConnector implements Runnable {
         }
     }
 
+    /**
+     * Runs the hold test to make sure the user doesn't have holds on their
+     * account
+     * Returns 2 for failed a hold or 0 for no problems
+     * 
+     * @param webClient The connection web client
+     * @return The result of the test
+     */
     public int holdTest(WebClient webClient) {
         try {
             log.println("Running hold test.");
@@ -280,7 +339,14 @@ public class WingsExpressConnector implements Runnable {
         }
     }
 
-    public int awknowledgementTest(WebClient webClient) {
+    /**
+     * Runs the acknowledgment test to make sure the user has dealt with that
+     * Returns 3 for a failed financial acknowledgment or 0 for no problems
+     * 
+     * @param webClient The connection client
+     * @return The int of how the test turned out
+     */
+    public int acknowledgmentTest(WebClient webClient) {
         try {
             log.println("Running awknowledgement test.");
             int failureCheck = 0;
