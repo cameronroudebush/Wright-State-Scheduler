@@ -5,8 +5,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimerTask;
+import javafx.application.Platform;
 import javafx.scene.control.TextField;
-import javax.swing.SwingUtilities;
 
 /**
  * This class is used as the clock to tell the current time.
@@ -42,7 +42,7 @@ public class Clock extends TimerTask {
     @Override
     public void run() {
         {
-            SwingUtilities.invokeLater(() -> {
+            Platform.runLater(() -> {
                 DateFormat dateAndTime = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss aa");
                 Date date = new Date();
                 try {

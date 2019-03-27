@@ -15,7 +15,6 @@ import java.util.ResourceBundle;
 import java.util.Stack;
 import java.util.Timer;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -33,9 +32,10 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleGroup;
 
 /**
- * This class is used to control the FXML for main UI display
- *  The main UI display is classified as the one containing the crn boxes
- *  and important registration information.
+ * This class is used to control the FXML for main UI display The main UI
+ * display is classified as the one containing the crn boxes and important
+ * registration information.
+ *
  * @author Cameron Roudebush
  */
 public class MainController implements Initializable {
@@ -97,29 +97,32 @@ public class MainController implements Initializable {
 
     /**
      * The initial function
+     *
      * @param location
      * @param resources
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Add all the crn boxes to an array for us to itterate over later
-        crnBoxes.add(crnBox1);
-        crnBoxes.add(crnBox2);
-        crnBoxes.add(crnBox3);
-        crnBoxes.add(crnBox4);
-        crnBoxes.add(crnBox5);
-        crnBoxes.add(crnBox6);
-        crnBoxes.add(crnBox7);
-        crnBoxes.add(crnBox8);
-        for (int i = 0; i < crnBoxes.size(); i++) {
-            crnBoxes.get(i).setPromptText("12345");
-            TextFormatter<TextField> tf = new TextFormatter<>(e -> {
-                if (e.getControlNewText().length() > 5) {
-                    return null;
-                }
-                return e;
-            });
-            crnBoxes.get(i).setTextFormatter(tf);
+        if (crnBoxes.isEmpty()) {
+            crnBoxes.add(crnBox1);
+            crnBoxes.add(crnBox2);
+            crnBoxes.add(crnBox3);
+            crnBoxes.add(crnBox4);
+            crnBoxes.add(crnBox5);
+            crnBoxes.add(crnBox6);
+            crnBoxes.add(crnBox7);
+            crnBoxes.add(crnBox8);
+            for (int i = 0; i < crnBoxes.size(); i++) {
+                crnBoxes.get(i).setPromptText("12345");
+                TextFormatter<TextField> tf = new TextFormatter<>(e -> {
+                    if (e.getControlNewText().length() > 5) {
+                        return null;
+                    }
+                    return e;
+                });
+                crnBoxes.get(i).setTextFormatter(tf);
+            }
         }
         // Update the schedule date selection to restrict data
         scheduleDate.setValue(LocalDate.now());
@@ -133,7 +136,7 @@ public class MainController implements Initializable {
             }
         });
         // Add the information for schedule time to fill the selection boxes
-        scheduleTimeHour.getItems().addAll("01", "02", "03", "04", "05", "06", 
+        scheduleTimeHour.getItems().addAll("01", "02", "03", "04", "05", "06",
                 "07", "08", "09", "10", "11", "12");
         for (int i = 0; i < 60; i++) {
             if (i < 10) {
@@ -146,6 +149,7 @@ public class MainController implements Initializable {
 
     /**
      * Set some stuff we will need to use later on
+     *
      * @param UID The users id or UID as wright state calls it
      * @param PIN The password of the user
      * @param log The log stream to output important logs
@@ -161,11 +165,13 @@ public class MainController implements Initializable {
 
     /**
      * Handles when the schedule button is clicked.
+     *
      * @param event Not used for anything
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     @FXML
-    protected void handleSchedule(ActionEvent event) throws IOException {
+    protected void handleSchedule(ActionEvent event) throws IOException, InterruptedException {
         // Check if the button has already been clicked.
         if (waiter == null) {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
@@ -295,14 +301,12 @@ public class MainController implements Initializable {
                                     }
                                 }
                                 // Attempt to show the progress indicator so the user knows the schedular is waiting
-                                Task task = new Task() {
+                                Platform.runLater(new Runnable() {
                                     @Override
-                                    protected Object call() throws Exception {
-                                        Platform.runLater(() -> progressIndicator.setVisible(true));
-                                        return null;
+                                    public void run() {
+                                        progressIndicator.setVisible(true);
                                     }
-                                };
-                                new Thread(task).start();
+                                });
                                 // Create the waiter so the schedular starts to run
                                 waiter = new ScheduleWaiter(clock, scheduleDate.getValue().format(dateFormatter),
                                         timeToSchedule, PIN, UID, semester, crns, log, progressIndicator, this);

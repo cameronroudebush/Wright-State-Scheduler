@@ -72,7 +72,8 @@ public class ScheduleWaiter implements Runnable {
             try {
                 log.println("Hit wait command on date: " + currentTime.getCurrentDateAndTime() + " " + scheduleDate);
                 Thread.sleep(1000);
-            } catch (InterruptedException ex) {
+            } catch (Exception ex) {
+                log.println(ex);
             }
         }
         while (!currentTime.getCurrentDateAndTime().substring(25, currentTime.getCurrentDateAndTime().length()).equals(scheduleTime)) {
@@ -80,7 +81,8 @@ public class ScheduleWaiter implements Runnable {
             try {
                 log.println("Hit wait command on time: " + currentTime.getCurrentDateAndTime() + " " + scheduleTime);
                 Thread.sleep(1000);
-            } catch (InterruptedException ex) {
+            } catch (Exception ex) {
+                log.println(ex);
             }
         }
         try {

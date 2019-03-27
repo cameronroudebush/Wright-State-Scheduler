@@ -11,7 +11,6 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -23,6 +22,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 /**
@@ -41,6 +41,8 @@ public class LoginController implements Initializable {
     private TextField pin;
     @FXML
     private ProgressIndicator progressIndicator;
+    @FXML
+    private Text capsLockWarning;
 
     /**
      * This is the first class ever actually ran so we get to start it all!
@@ -68,6 +70,7 @@ public class LoginController implements Initializable {
 
     /**
      * This function handles the login button
+     *
      * @param event Not used
      * @throws IOException
      * @throws InterruptedException
@@ -132,7 +135,7 @@ public class LoginController implements Initializable {
                     Stage appStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
                     appStage.setScene(scene);
                     appStage.show();
-                }catch (IOException ex) {
+                } catch (IOException ex) {
                     log.println("IO error for fxml" + ex);
                 }
             }
