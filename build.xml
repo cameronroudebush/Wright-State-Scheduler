@@ -7,13 +7,13 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="Wright_State_Scheduler" default="default" basedir=".">
+<project name="Wright_State_Scheduler" default="build" basedir=".">
     <description>Builds, tests, and runs the project Wright State Scheduler.</description>
     <import file="nbproject/build-impl.xml"/>
     <property name="store.dir" value="store"/>
     <property name="media.dir" value="src/Media"/>
     
-    <target name="default" depends="jar">
+    <target name="build" depends="jar">
         <property name="store.jar.test" value="WSS"/>
         
         <property name="store.jar" value="${store.dir}/WSS.jar"/>
@@ -46,9 +46,9 @@
             <config headerType="gui" outfile="${store.dir}/WSS.exe"
                     jarPath="${store.dir}/WSS.jar" icon="${media.dir}/Icon.ico">
                 <jre minVersion="1.8.0"/>
-                <versionInfo fileVersion="0.0.0.3" txtFileVersion="0.0.0.3" 
+                <versionInfo fileVersion="1.0.0.0" txtFileVersion="1.0.0.0" 
                              fileDescription="Wright-State-Scheduler" copyright=" " 
-                             productVersion="0.0.0.2" txtProductVersion="0.0.0.2"
+                             productVersion="1.0.0.0" txtProductVersion="1.0.0.0"
                              productName="WSS" companyName=" " internalName="WSS" 
                              originalFileName="WSS.exe" trademarks=" " language="ENGLISH_US"/>
             </config>
