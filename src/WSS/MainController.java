@@ -289,7 +289,7 @@ public class MainController implements Initializable {
                             alert.getButtonTypes().setAll(buttonYes, buttonNo);
                             alert.setContentText("All preliminary tests have passed but please note this program does not test for valid CRN numbers. "
                                     + "Currently you will be registering for the following date/semester and time: \n"
-                                    + scheduleDate.getValue().format(dateFormatter) + " " + semesterString + " " + timeToSchedule
+                                    + scheduleDate.getValue().format(dateFormatter) + " Semester: " + semesterString + " " + timeToSchedule
                                     + "\nIf you would like to continue with this info press yes. If something looks wrong press no and please correct it.");
                             Optional<ButtonType> result = alert.showAndWait();
                             if (result.get() == buttonYes) {

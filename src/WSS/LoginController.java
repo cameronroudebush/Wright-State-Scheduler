@@ -51,6 +51,7 @@ public class LoginController implements Initializable {
         try {
             // Create the log file
             this.log = new PrintStream(new File("log.txt"));
+            log.println("WSS started with version 1.0.0.1");
         } catch (FileNotFoundException ex) {
             System.out.println("Error, file could not be created.");
         }
