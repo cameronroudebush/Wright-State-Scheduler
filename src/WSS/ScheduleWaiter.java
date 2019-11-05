@@ -70,7 +70,7 @@ public class ScheduleWaiter implements Runnable {
         while (!currentTime.getCurrentDateAndTime().substring(14, 24).equals(scheduleDate)) {
             // Attempt to wait since we are at the wrong date
             try {
-                log.println("Hit wait command on date: " + currentTime.getCurrentDateAndTime() + " " + scheduleDate);
+//                log.println("Hit wait command on date: " + currentTime.getCurrentDateAndTime() + " " + scheduleDate);
                 Thread.sleep(1000);
             } catch (Exception ex) {
                 log.println(ex);
@@ -79,7 +79,7 @@ public class ScheduleWaiter implements Runnable {
         while (!currentTime.getCurrentDateAndTime().substring(25, currentTime.getCurrentDateAndTime().length()).equals(scheduleTime)) {
             // Attempt to wait since we are at the wrong time
             try {
-                log.println("Hit wait command on time: " + currentTime.getCurrentDateAndTime() + " " + scheduleTime);
+//                log.println("Hit wait command on time: " + currentTime.getCurrentDateAndTime() + " " + scheduleTime);
                 Thread.sleep(1000);
             } catch (Exception ex) {
                 log.println(ex);
@@ -88,6 +88,12 @@ public class ScheduleWaiter implements Runnable {
         try {
             // We are done waiting so move on
             String scheduleYear = scheduleDate.substring(scheduleDate.length() - 4, scheduleDate.length());
+            // Adjust year if spring semester was selected because they probably mean next spring
+            if (semester == 30) {
+                int tempYear = Integer.parseInt(scheduleYear) + 1;
+                log.println("Spring semester detected, adjusting scheduleYear to " + tempYear);
+                scheduleYear = Integer.toString(tempYear);
+            }
             WingsExpressConnector connector = new WingsExpressConnector(pin, uid, scheduleYear + semester, crns, log);
             {
                 Thread t = new Thread(connector);
